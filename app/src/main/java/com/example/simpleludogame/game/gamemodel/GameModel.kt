@@ -1,4 +1,7 @@
-package com.example.simpleludogame.gamemodel
+package com.example.simpleludogame.game.gamemodel
+
+import com.example.simpleludogame.game.gamemodel.cell.Cell
+import com.example.simpleludogame.game.gamemodel.cell.CellType
 
 class GameModel {
     var board = Array<Array<Cell>>(15) { row ->

@@ -16,7 +16,7 @@
     </fragment>
     <fragment
         android:id="@+id/gameFragment"
-        android:name="com.example.simpleludogame.GameFragment"
+        android:name="com.example.simpleludogame.game.GameFragment"
         android:label="fragment_game"
         tools:layout="@layout/fragment_game" >
         <action

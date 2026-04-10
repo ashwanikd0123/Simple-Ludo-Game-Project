@@ -1,4 +1,4 @@
-package com.example.simpleludogame.gamemodel
+package com.example.simpleludogame.game.gamemodel
 
 import androidx.lifecycle.ViewModel
 
