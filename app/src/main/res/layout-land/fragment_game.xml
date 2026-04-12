@@ -36,10 +36,10 @@
             android:layout_height="50dp"
             android:background="@drawable/dice_1"
             android:foreground="@drawable/dice_1"
+            android:shadowRadius="16"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            android:shadowRadius="16"/>
+            app:layout_constraintTop_toTopOf="parent" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

@@ -12,7 +12,7 @@ class Player(val colors: PlayerColors, val startCell: Cell, val invalidCell: Cel
 
     var pawns = Array<Pawn>(4) {
         Pawn(colors).apply {
-            setCell(startCell)
+            setCell(inHouseCell)
         }
     }
 
@@ -35,7 +35,7 @@ class Player(val colors: PlayerColors, val startCell: Cell, val invalidCell: Cel
                 continue
             }
 
-            if (pawn.cell == inHouseCell && number == 6) {
+            if (pawn.getCell() == inHouseCell && number == 6) {
                 res.add(pawn)
                 continue
             }
@@ -49,6 +49,7 @@ class Player(val colors: PlayerColors, val startCell: Cell, val invalidCell: Cel
 
     fun isPossible(pawn: Pawn, number: Int): Boolean {
         pawn.getCell()?.let {
+            if (it == inHouseCell) return false
             var curPos = it
             for (i in 0 until number) {
                 curPos = getNextCell(curPos)
@@ -69,9 +70,10 @@ class Player(val colors: PlayerColors, val startCell: Cell, val invalidCell: Cel
     }
 
     fun moveOneUnit(pawn: Pawn) {
-        pawn.getCell()?.let {
-            it.removePawn(pawn)
-            pawn.setCell(getNextCell(it))
+        pawn.getCell()?.let { cell ->
+            cell.removePawn(pawn)
+            val next = if (cell == inHouseCell) startCell else getNextCell(cell)
+            pawn.setCell(next)
         }
         updateStatus()
     }

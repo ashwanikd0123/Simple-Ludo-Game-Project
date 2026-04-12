@@ -14,6 +14,11 @@
     <color name="ludo_yellow">#FFF9A825</color>
     <color name="ludo_red">#FFC62828</color>
     <color name="ludo_blue">#FF1565C0</color>
+    <!-- Deeper shades for pawn tint (SRC_IN) so pieces read clearly on matching board panels -->
+    <color name="ludo_pawn_green">#FF1B5E20</color>
+    <color name="ludo_pawn_yellow">#FFF57F17</color>
+    <color name="ludo_pawn_red">#FFB71C1C</color>
+    <color name="ludo_pawn_blue">#FF0D47A1</color>
     <color name="ludo_token_base">#FFFFF8E1</color>
     <color name="ludo_star_tint">#FFFFB300</color>
 </resources>

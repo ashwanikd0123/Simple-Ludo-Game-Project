@@ -8,6 +8,7 @@ import android.graphics.RectF
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.View
+import android.view.View.MeasureSpec
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
@@ -66,8 +67,13 @@ class LudoBoardBackgroundView @JvmOverloads constructor(
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        val size = min(widthMeasureSpec, heightMeasureSpec)
-        super.onMeasure(size, size)
+        val w = MeasureSpec.getSize(widthMeasureSpec)
+        val h = MeasureSpec.getSize(heightMeasureSpec)
+        var side = min(w, h)
+        if (side <= 0) {
+            side = (resources.displayMetrics.density * 280f).toInt().coerceAtLeast(1)
+        }
+        setMeasuredDimension(side, side)
     }
 
     override fun onDraw(canvas: Canvas) {
