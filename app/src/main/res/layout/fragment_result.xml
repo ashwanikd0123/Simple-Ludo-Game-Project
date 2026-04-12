@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:background="@drawable/bg_gradient_home"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ResultFragment">
@@ -12,5 +13,5 @@
         android:layout_height="match_parent"
         android:text="" />
 
-</FrameLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

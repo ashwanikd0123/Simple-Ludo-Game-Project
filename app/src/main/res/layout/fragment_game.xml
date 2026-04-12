@@ -4,13 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/game_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#F3E7D3"
+        android:background="@drawable/bg_gradient_home"
         tools:context=".game.GameFragment"
         android:padding="16dp">
 
         <FrameLayout
+            android:id="@+id/board_container"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent"
