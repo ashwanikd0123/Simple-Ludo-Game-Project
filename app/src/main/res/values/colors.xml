@@ -7,4 +7,13 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <color name="ludo_board_background">#00000000</color>
+    <color name="ludo_board_stroke">#FF2B2B2B</color>
+    <color name="ludo_green">#FF2E7D32</color>
+    <color name="ludo_yellow">#FFF9A825</color>
+    <color name="ludo_red">#FFC62828</color>
+    <color name="ludo_blue">#FF1565C0</color>
+    <color name="ludo_token_base">#FFFFF8E1</color>
+    <color name="ludo_star_tint">#FFFFB300</color>
 </resources>

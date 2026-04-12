@@ -2,7 +2,6 @@ package com.example.simpleludogame.game
 
 import android.content.Context
 import android.graphics.Canvas
-import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.RectF
@@ -10,6 +9,7 @@ import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.View
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import com.example.simpleludogame.R
 import kotlin.math.min
@@ -23,7 +23,7 @@ class LudoBoardBackgroundView @JvmOverloads constructor(
     private val gridSize = 15
 
     private val boardBackgroundPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.TRANSPARENT
+        color = ContextCompat.getColor(context, R.color.ludo_board_background)
         style = Paint.Style.FILL
     }
 
@@ -32,7 +32,7 @@ class LudoBoardBackgroundView @JvmOverloads constructor(
     }
 
     private val strokePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.parseColor("#2B2B2B")
+        color = ContextCompat.getColor(context, R.color.ludo_board_stroke)
         style = Paint.Style.STROKE
         strokeWidth = resources.displayMetrics.density
     }
@@ -43,12 +43,13 @@ class LudoBoardBackgroundView @JvmOverloads constructor(
 
     private val starDrawable: Drawable? = AppCompatResources.getDrawable(context, R.drawable.ic_ludo_star)
 
-    private val greenColor = Color.parseColor("#2E7D32")
-    private val yellowColor = Color.parseColor("#F9A825")
-    private val redColor = Color.parseColor("#C62828")
-    private val blueColor = Color.parseColor("#1565C0")
-    private val neutralCellColor = Color.WHITE
-    private val tokenBaseColor = Color.parseColor("#FFF8E1")
+    private val greenColor = ContextCompat.getColor(context, R.color.ludo_green)
+    private val yellowColor = ContextCompat.getColor(context, R.color.ludo_yellow)
+    private val redColor = ContextCompat.getColor(context, R.color.ludo_red)
+    private val blueColor = ContextCompat.getColor(context, R.color.ludo_blue)
+    private val neutralCellColor = ContextCompat.getColor(context, R.color.white)
+    private val tokenBaseColor = ContextCompat.getColor(context, R.color.ludo_token_base)
+    private val starTintColor = ContextCompat.getColor(context, R.color.ludo_star_tint)
 
     companion object {
         /** 0-based (row, column); 1-based board cell (1, 8). */
@@ -203,7 +204,7 @@ class LudoBoardBackgroundView @JvmOverloads constructor(
         starBounds.forEach { (row, column) ->
             val rect = cellRect(left, top, cellSize, row, column)
             val star = starDrawable?.mutate() ?: return@forEach
-            DrawableCompat.setTint(star, Color.parseColor("#FFB300"))
+            DrawableCompat.setTint(star, starTintColor)
             val inset = (cellSize * 0.18f).toInt()
             star.setBounds(
                 rect.left.toInt() + inset,
