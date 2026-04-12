@@ -1,12 +1,52 @@
 package com.example.simpleludogame.game.gamemodel
 
-import com.example.simpleludogame.game.gamemodel.cell.Cell
-import com.example.simpleludogame.game.gamemodel.cell.CellType
+import androidx.lifecycle.MutableLiveData
+import com.example.simpleludogame.game.gamemodel.ludomodel.cell.Cell
+import com.example.simpleludogame.game.gamemodel.ludomodel.cell.CellType
+import com.example.simpleludogame.game.gamemodel.ludomodel.player.Player
+import com.example.simpleludogame.game.gamemodel.ludomodel.player.PlayerColors
+import com.example.simpleludogame.game.gamemodel.ludomodel.player.PlayerStatus
 
-class GameModel {
+class GameModel(val playerCount: Int) {
     var board = Array<Array<Cell>>(15) { row ->
         Array<Cell>(15) { col ->
             Cell(row, col)
+        }
+    }
+
+    private val greenPlayer = Player(PlayerColors.GREEN, board[6][1], board[6][0], board[7][1]); // upper left green
+    private val yellowPlayer = Player(PlayerColors.YELLOW, board[1][8], board[0][8], board[1][7]); // upper right yellow
+    private val bluePlayer = Player(PlayerColors.BLUE, board[8][13], board[8][14], board[7][13]); // lower right blue
+    private val redPlayer = Player(PlayerColors.RED, board[13][6], board[14][6], board[13][7]); // lower left red
+    init {
+        initPlayers()
+        initBoard()
+    }
+
+    lateinit var players: Array<Player>
+
+    var currentPlayer = MutableLiveData<Int>(0)
+
+    fun initPlayers() {
+        when (playerCount) {
+            1 -> players = arrayOf(
+                    greenPlayer
+                )
+            2 -> players = arrayOf(
+                    yellowPlayer,
+                    redPlayer
+                )
+            3 -> players = arrayOf(
+                    yellowPlayer,
+                    bluePlayer,
+                    redPlayer
+                )
+            else -> players = arrayOf(
+                    greenPlayer,
+                    yellowPlayer,
+                    bluePlayer,
+                    redPlayer
+                )
         }
     }
 
@@ -105,5 +145,34 @@ class GameModel {
         board[12][8].type = CellType.STAR
         board[13][6].type = CellType.STAR
         board[8][2].type = CellType.STAR
+    }
+
+    fun gameEnd(): Boolean {
+        var playingCount = 0
+        for (player in players) {
+            if (player.getStatus() == PlayerStatus.PLAYING) {
+                playingCount++
+            }
+        }
+        return playingCount > 1
+    }
+
+    fun moveToNextPlayer(): Boolean {
+        var curValue = currentPlayer.value!! + 1
+        var count = 0
+        while (players[curValue].getStatus() != PlayerStatus.PLAYING) {
+            curValue = (curValue + 1) % players.size
+            count++
+            if (count == playerCount) {
+                return false
+            }
+        }
+        currentPlayer.value = curValue
+        return true
+    }
+
+    fun getCurrentPlayer(): Player? {
+        currentPlayer.value?.let { return players[it] }
+        return null
     }
 }
