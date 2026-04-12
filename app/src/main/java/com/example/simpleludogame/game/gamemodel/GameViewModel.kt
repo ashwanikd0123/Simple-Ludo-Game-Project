@@ -35,6 +35,9 @@ class GameViewModel() : ViewModel() {
                     delay(LudoBoardForeGroundView.PAWN_MOVE_ANIMATION_DURATION_MS.toLong() + 100L)
                 }
                 isMoving.postValue(false)
+                if (!gameModel.moveToNextPlayer()) {
+                    gameModel.gameEnd()
+                }
             }
         }
     }

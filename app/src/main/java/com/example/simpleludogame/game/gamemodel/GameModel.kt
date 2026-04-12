@@ -159,7 +159,7 @@ class GameModel(val playerCount: Int) {
     }
 
     fun moveToNextPlayer(): Boolean {
-        var curValue = currentPlayer.value!! + 1
+        var curValue = (currentPlayer.value!! + 1) % players.size
         var count = 0
         while (players[curValue].getStatus() != PlayerStatus.PLAYING) {
             curValue = (curValue + 1) % players.size

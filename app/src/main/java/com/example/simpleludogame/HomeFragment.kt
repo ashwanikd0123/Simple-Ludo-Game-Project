@@ -27,7 +27,7 @@ class HomeFragment : Fragment() {
         binding = FragmentHomeBinding.inflate(inflater)
 
         binding.playButton.setOnClickListener {
-            viewModel.initGame(1)
+            viewModel.initGame(2)
             findNavController().navigate(R.id.action_homeFragment_to_gameFragment)
         }
 
