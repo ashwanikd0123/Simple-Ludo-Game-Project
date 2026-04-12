@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Dark Green Theme Colors -->
+    <color name="green_primary">#81C784</color>
+    <color name="green_primary_variant">#43A047</color>
+    <color name="green_secondary">#2E7D32</color>
+    <color name="green_background_start">#1B5E20</color>
+    <color name="green_background_end">#121212</color>
+    <color name="button_green">#43A047</color>
+    <color name="card_background">#1E1E1E</color>
+    <color name="text_on_background">#E0E0E0</color>
+</resources>

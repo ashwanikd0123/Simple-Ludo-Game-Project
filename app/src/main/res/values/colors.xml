@@ -8,6 +8,16 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
+    <!-- Green Theme Colors (Light) -->
+    <color name="green_primary">#2E7D32</color>
+    <color name="green_primary_variant">#1B5E20</color>
+    <color name="green_secondary">#81C784</color>
+    <color name="green_background_start">#E8F5E9</color>
+    <color name="green_background_end">#C8E6C9</color>
+    <color name="button_green">#43A047</color>
+    <color name="card_background">#FFFFFF</color>
+    <color name="text_on_background">#212121</color>
+
     <color name="ludo_board_background">#00000000</color>
     <color name="ludo_board_stroke">#FF2B2B2B</color>
     <color name="ludo_green">#FF2E7D32</color>

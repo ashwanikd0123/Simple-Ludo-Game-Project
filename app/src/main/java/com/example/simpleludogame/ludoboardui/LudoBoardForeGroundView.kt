@@ -5,7 +5,6 @@ import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
-import android.graphics.PorterDuff
 import android.graphics.RectF
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
@@ -14,8 +13,6 @@ import android.view.View
 import android.view.View.MeasureSpec
 import android.view.animation.DecelerateInterpolator
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.core.content.ContextCompat
-import androidx.core.graphics.drawable.DrawableCompat
 import com.example.simpleludogame.R
 import com.example.simpleludogame.game.gamemodel.ludomodel.cell.Cell
 import com.example.simpleludogame.game.gamemodel.ludomodel.cell.inHouseCell
@@ -35,14 +32,10 @@ class LudoBoardForeGroundView @JvmOverloads constructor(
 
     private val gridSize = 15
 
-    private val pawnGreenColor = ContextCompat.getColor(context, R.color.ludo_pawn_green)
-    private val pawnYellowColor = ContextCompat.getColor(context, R.color.ludo_pawn_yellow)
-    private val pawnRedColor = ContextCompat.getColor(context, R.color.ludo_pawn_red)
-    private val pawnBlueColor = ContextCompat.getColor(context, R.color.ludo_pawn_blue)
-
-    /** Use [constantState] to create a fresh drawable per pawn so tinting works reliably on vectors. */
-    private val pawnDrawableState: Drawable.ConstantState? =
-        AppCompatResources.getDrawable(context, R.drawable.ic_ludo_pawn)?.constantState
+    private val greenPawnDrawable = AppCompatResources.getDrawable(context, R.drawable.ic_pawn_green)
+    private val yellowPawnDrawable = AppCompatResources.getDrawable(context, R.drawable.ic_pawn_yellow)
+    private val redPawnDrawable = AppCompatResources.getDrawable(context, R.drawable.ic_pawn_red)
+    private val bluePawnDrawable = AppCompatResources.getDrawable(context, R.drawable.ic_pawn_blue)
 
     /** Slot index 0–3 inside the colored home pane; stable for each pawn once assigned. */
     var pawnInHouseCellCoord = mutableMapOf<Pawn, Int>()
@@ -164,12 +157,10 @@ class LudoBoardForeGroundView @JvmOverloads constructor(
             if (p == animatingPawn) 1 else 0
         }
 
-        val state = pawnDrawableState ?: return
         for (pawn in drawOrder) {
             val (cx, cy) = drawPosition(pawn, metrics) ?: continue
-            val d = state.newDrawable(resources, context.theme).mutate()
-            DrawableCompat.setTintMode(d, PorterDuff.Mode.SRC_IN)
-            DrawableCompat.setTint(d, colorForPlayer(pawn.player))
+            val d = drawableForPlayer(pawn.player) ?: continue
+            
             var l = (cx - half).toInt()
             var t = (cy - half).toInt()
             var r = (cx + half).toInt()
@@ -314,11 +305,11 @@ class LudoBoardForeGroundView @JvmOverloads constructor(
         }
     }
 
-    private fun colorForPlayer(color: PlayerColors): Int = when (color) {
-        PlayerColors.GREEN -> pawnGreenColor
-        PlayerColors.YELLOW -> pawnYellowColor
-        PlayerColors.RED -> pawnRedColor
-        PlayerColors.BLUE -> pawnBlueColor
+    private fun drawableForPlayer(color: PlayerColors): Drawable? = when (color) {
+        PlayerColors.GREEN -> greenPawnDrawable
+        PlayerColors.YELLOW -> yellowPawnDrawable
+        PlayerColors.RED -> redPawnDrawable
+        PlayerColors.BLUE -> bluePawnDrawable
     }
 
     private data class BoardMetrics(
