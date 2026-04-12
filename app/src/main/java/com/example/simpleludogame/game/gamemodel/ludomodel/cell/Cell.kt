@@ -16,6 +16,10 @@ class Cell(val row: Int, val col: Int) {
     }
 
     fun releaseAllPawns(except: Pawn) {
+        if (type != CellType.NORMAL) {
+            return
+        }
+
         for (pawn in pawns.toList()) {
             if (pawn.player == except.player) {
                 continue
