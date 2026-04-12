@@ -1,4 +1,4 @@
-package com.example.simpleludogame.game
+package com.example.simpleludogame.ludoboardui
 
 import android.content.Context
 import android.graphics.Canvas
@@ -63,6 +63,11 @@ class LudoBoardBackgroundView @JvmOverloads constructor(
 
         /** 0-based (row, column); 1-based (13, 7). */
         private val redStartPointCell = 13 to 6
+    }
+
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        val size = min(widthMeasureSpec, heightMeasureSpec)
+        super.onMeasure(size, size)
     }
 
     override fun onDraw(canvas: Canvas) {

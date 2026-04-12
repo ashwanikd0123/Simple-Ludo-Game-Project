@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:padding="16dp">
 
-    <com.example.simpleludogame.ludoboardui.LudoBoardBackgroundView
+    <com.example.simpleludogame.ludoboardui.LudoBoardForeGroundView
         android:id="@+id/ludo_board_background"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

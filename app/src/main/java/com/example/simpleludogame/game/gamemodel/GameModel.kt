@@ -18,6 +18,7 @@ class GameModel(val playerCount: Int) {
     private val yellowPlayer = Player(PlayerColors.YELLOW, board[1][8], board[0][8], board[1][7]); // upper right yellow
     private val bluePlayer = Player(PlayerColors.BLUE, board[8][13], board[8][14], board[7][13]); // lower right blue
     private val redPlayer = Player(PlayerColors.RED, board[13][6], board[14][6], board[13][7]); // lower left red
+
     init {
         initPlayers()
         initBoard()
