@@ -3,4 +3,11 @@
     <string name="select_players">Select Number of Players</string>
     <string name="play">Play</string>
     <string name="ludo_game_title">Simple Ludo</string>
+    <string name="game_results">Game Results</string>
+    <string name="home">Home</string>
+    <string name="rank_1">1st Place</string>
+    <string name="rank_2">2nd Place</string>
+    <string name="rank_3">3rd Place</string>
+    <string name="rank_4">4th Place</string>
+    <string name="player_format">Player %s</string>
 </resources>

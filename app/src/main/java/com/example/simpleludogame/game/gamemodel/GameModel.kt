@@ -155,7 +155,7 @@ class GameModel(val playerCount: Int) {
                 playingCount++
             }
         }
-        return playingCount > 1
+        return playingCount == 1
     }
 
     fun moveToNextPlayer(): Boolean {

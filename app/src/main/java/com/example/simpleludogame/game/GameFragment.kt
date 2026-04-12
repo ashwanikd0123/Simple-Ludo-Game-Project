@@ -10,6 +10,7 @@ import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import com.example.simpleludogame.R
 import com.example.simpleludogame.databinding.FragmentGameBinding
 import com.example.simpleludogame.game.gamemodel.GameViewModel
@@ -53,6 +54,12 @@ class GameFragment : Fragment() {
         viewModel.currentPlayer.observe(viewLifecycleOwner) { playerIndex ->
             val player = viewModel.getAllPlayers().getOrNull(playerIndex) ?: return@observe
             updateDiceButtonPosition(player.colors)
+        }
+
+        viewModel.gameEnd.observe(viewLifecycleOwner) {
+            if (it) {
+                findNavController().navigate(R.id.action_gameFragment_to_resultFragment)
+            }
         }
 
         val players = viewModel.getAllPlayers()

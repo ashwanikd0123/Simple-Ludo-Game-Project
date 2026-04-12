@@ -18,10 +18,16 @@ class GameViewModel() : ViewModel() {
     lateinit var currentPlayer: LiveData<Int>
     var diceVal = MutableLiveData<Int>(1)
     var isMoving = MutableLiveData<Boolean>(false)
+    var gameEnd = MutableLiveData<Boolean>(false)
+    
+    var playerRanking = 1
 
     fun initGame(playerCount: Int) {
         gameModel = GameModel(playerCount)
         currentPlayer = gameModel.currentPlayer
+        playerRanking = 0
+        gameEnd.value = false
+        isMoving.value = false
     }
 
     fun getCurrentPlayer(): Player? {
@@ -65,7 +71,13 @@ class GameViewModel() : ViewModel() {
 
                 // dice should move when player has won
                 if (currentPlayer.hasWon()) {
-                    currentPlayer.setStatus(PlayerStatus.WON)
+                    playerRanking++
+                    when (playerRanking) {
+                        1 -> currentPlayer.setStatus(PlayerStatus.RANK_1)
+                        2 -> currentPlayer.setStatus(PlayerStatus.RANK_2)
+                        3 -> currentPlayer.setStatus(PlayerStatus.RANK_3)
+                        else -> currentPlayer.setStatus(PlayerStatus.LOSE)
+                    }
                     shouldMoveToNextPlayer = true
                 }
 
@@ -79,9 +91,8 @@ class GameViewModel() : ViewModel() {
     }
 
     private fun moveNextPlayer() {
-        if (!gameModel.moveToNextPlayer()) {
-            gameModel.gameEnd()
-        }
+        gameEnd.value = gameModel.gameEnd()
+        gameModel.moveToNextPlayer()
     }
 
     fun getAllPlayers(): Array<Player> {
