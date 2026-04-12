@@ -5,11 +5,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.simpleludogame.game.gamemodel.dicemodel.Dice
+import com.example.simpleludogame.game.gamemodel.ludomodel.cell.CellType
 import com.example.simpleludogame.game.gamemodel.ludomodel.player.Player
-import com.example.simpleludogame.game.gamemodel.ludomodel.player.PlayerColors
 import com.example.simpleludogame.ludoboardui.LudoBoardForeGroundView
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 
 class GameViewModel() : ViewModel() {
@@ -50,7 +49,19 @@ class GameViewModel() : ViewModel() {
 
                 isMoving.postValue(false)
 
-                if (num != 6) {
+                var shouldMoveToNextPlayer = true
+
+                // dice should not move when last number was 6 or pawn reached goal
+                if (pawn.cell.value?.type == CellType.GOAL || num == 6) {
+                    shouldMoveToNextPlayer = false
+                }
+
+                // dice should move when player has won
+                if (currentPlayer.hasWon()) {
+                    shouldMoveToNextPlayer = true
+                }
+
+                if (shouldMoveToNextPlayer) {
                     moveNextPlayer()
                 }
             }

@@ -27,6 +27,15 @@ class Player(val colors: PlayerColors, val startCell: Cell, val invalidCell: Cel
         _status.value = status
     }
 
+    fun hasWon(): Boolean {
+        for (pawn in pawns) {
+            if (pawn.getCell()!!.type != CellType.GOAL) {
+                return false
+            }
+        }
+        return true
+    }
+
     fun canMove(number: Int): List<Pawn> {
         val res = mutableListOf<Pawn>()
 
