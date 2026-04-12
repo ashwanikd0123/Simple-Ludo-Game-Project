@@ -10,7 +10,6 @@ import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
-import android.view.View.MeasureSpec
 import android.view.animation.DecelerateInterpolator
 import androidx.appcompat.content.res.AppCompatResources
 import com.example.simpleludogame.R
@@ -151,7 +150,7 @@ class LudoBoardForeGroundView @JvmOverloads constructor(
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         val metrics = boardMetrics() ?: return
-        val half = metrics.cellSize * 0.5f
+        val half = metrics.cellSize * 0.7f
 
         val drawOrder = pawnCellMap.keys.sortedBy { p ->
             if (p == animatingPawn) 1 else 0

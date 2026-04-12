@@ -18,4 +18,9 @@ class Pawn(val player: PlayerColors) {
         cell.addPawn(this)
         _cell.value = cell
     }
+
+    fun setWithoutRemoval(cell: Cell) {
+        cell.addPawn(this)
+        _cell.value = cell
+    }
 }

@@ -8,8 +8,6 @@ import com.example.simpleludogame.game.gamemodel.ludomodel.cell.inHouseCell
 import com.example.simpleludogame.game.gamemodel.ludomodel.pawn.Pawn
 
 class Player(val colors: PlayerColors, val startCell: Cell, val invalidCell: Cell, val inSafeCell: Cell) {
-    var isPlaying = true
-
     var pawns = Array<Pawn>(4) {
         Pawn(colors).apply {
             setCell(inHouseCell)
@@ -87,11 +85,17 @@ class Player(val colors: PlayerColors, val startCell: Cell, val invalidCell: Cel
 
     fun moveOneUnit(pawn: Pawn) {
         pawn.getCell()?.let { cell ->
-            cell.removePawn(pawn)
             val next = if (cell == inHouseCell) startCell else getNextCell(cell)
             pawn.setCell(next)
         }
         updateStatus()
+    }
+
+    fun resolveNextCell(pawn: Pawn) {
+        pawn.getCell()?.let { cell ->
+            val next = if (cell == inHouseCell) startCell else getNextCell(cell)
+            next.releaseAllPawns(pawn)
+        }
     }
 
     fun updateStatus() {

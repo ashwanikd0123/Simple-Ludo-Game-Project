@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.simpleludogame.game.gamemodel.dicemodel.Dice
 import com.example.simpleludogame.game.gamemodel.ludomodel.cell.CellType
 import com.example.simpleludogame.game.gamemodel.ludomodel.player.Player
+import com.example.simpleludogame.game.gamemodel.ludomodel.player.PlayerStatus
 import com.example.simpleludogame.ludoboardui.LudoBoardForeGroundView
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -42,10 +43,16 @@ class GameViewModel() : ViewModel() {
 
             isMoving.value = true
             viewModelScope.launch {
-                for (i in 1..moves) {
+                for (i in 1..(moves - 1)) {
                     currentPlayer.moveOneUnit(pawn)
                     delay(LudoBoardForeGroundView.PAWN_MOVE_ANIMATION_DURATION_MS.toLong() + 100L)
                 }
+
+                currentPlayer.resolveNextCell(pawn)
+                currentPlayer.moveOneUnit(pawn)
+
+                // short delay before next move
+                delay(LudoBoardForeGroundView.PAWN_MOVE_ANIMATION_DURATION_MS.toLong() + 200L)
 
                 isMoving.postValue(false)
 
@@ -58,6 +65,7 @@ class GameViewModel() : ViewModel() {
 
                 // dice should move when player has won
                 if (currentPlayer.hasWon()) {
+                    currentPlayer.setStatus(PlayerStatus.WON)
                     shouldMoveToNextPlayer = true
                 }
 

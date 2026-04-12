@@ -8,14 +8,20 @@ class Cell(val row: Int, val col: Int) {
     var pawns = mutableListOf<Pawn>()
 
     fun addPawn(pawn: Pawn) {
-        if (pawns.size == 1 && pawns[0].player != pawn.player) {
-            pawns[0].setCell(inHouseCell)
-        }
         pawns.add(pawn)
     }
 
     fun removePawn(pawn: Pawn) {
         pawns.remove(pawn)
+    }
+
+    fun releaseAllPawns(except: Pawn) {
+        for (pawn in pawns.toList()) {
+            if (pawn.player == except.player) {
+                continue
+            }
+            pawn.setCell(inHouseCell)
+        }
     }
 }
 
