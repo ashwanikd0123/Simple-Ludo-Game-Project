@@ -47,6 +47,13 @@ class Player(val colors: PlayerColors, val startCell: Cell, val invalidCell: Cel
         return res
     }
 
+    fun getNumberOfMoves(pawn: Pawn, number: Int): Int {
+        if (pawn.getCell() == inHouseCell && number == 6) {
+            return 1
+        }
+        return number
+    }
+
     fun isPossible(pawn: Pawn, number: Int): Boolean {
         pawn.getCell()?.let {
             if (it == inHouseCell) return false
