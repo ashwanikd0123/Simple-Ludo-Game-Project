@@ -51,10 +51,10 @@ class Player(val colors: PlayerColors, val startCell: Cell, val invalidCell: Cel
         pawn.getCell()?.let {
             if (it == inHouseCell) return false
             var curPos = it
-            for (i in 0 until number) {
+            for (i in 1 .. number) {
                 curPos = getNextCell(curPos)
                 if (curPos.type == CellType.GOAL) {
-                    return i == number - 1
+                    return i == number
                 }
             }
             return true

@@ -20,7 +20,6 @@ class GameFragment : Fragment() {
     private lateinit var ludoBoard: LudoBoardForeGroundView
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        viewModel.initGame(1)
         super.onCreate(savedInstanceState)
     }
 
