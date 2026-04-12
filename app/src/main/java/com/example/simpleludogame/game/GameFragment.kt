@@ -11,16 +11,11 @@ class GameFragment : Fragment() {
 
     private lateinit var binding: FragmentGameBinding
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        val binding = FragmentGameBinding.inflate(inflater)
-        // Inflate the layout for this fragment
+    ): View {
+        binding = FragmentGameBinding.inflate(inflater, container, false)
         return binding.root
     }
 }
