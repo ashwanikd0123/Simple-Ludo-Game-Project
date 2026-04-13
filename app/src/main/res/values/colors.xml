@@ -31,4 +31,27 @@
     <color name="ludo_pawn_blue">#FF0D47A1</color>
     <color name="ludo_token_base">#FFFFF8E1</color>
     <color name="ludo_star_tint">#FFFFB300</color>
+
+    <!-- Pawn specific colors -->
+    <color name="pawn_shadow">#33000000</color>
+
+    <color name="pawn_red_body">#C62828</color>
+    <color name="pawn_red_head">#D32F2F</color>
+    <color name="pawn_red_outline">#FFCDD2</color>
+
+    <color name="pawn_blue_body">#1565C0</color>
+    <color name="pawn_blue_head">#1976D2</color>
+    <color name="pawn_blue_outline">#BBDEFB</color>
+
+    <color name="pawn_green_body">#2E7D32</color>
+    <color name="pawn_green_head">#388E3C</color>
+    <color name="pawn_green_outline">#C8E6C9</color>
+
+    <color name="pawn_yellow_body">#F9A825</color>
+    <color name="pawn_yellow_head">#FBC02D</color>
+    <color name="pawn_yellow_outline">#FFF9C4</color>
+
+    <color name="pawn_neutral_body">#E0E0E0</color>
+    <color name="pawn_neutral_head">#F5F5F5</color>
+    <color name="pawn_neutral_outline">#FAFAFA</color>
 </resources>
