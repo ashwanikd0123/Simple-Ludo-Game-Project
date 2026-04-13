@@ -63,6 +63,10 @@ class GameFragment : Fragment() {
             }
         }
 
+        viewModel.selectablePawns.observe(viewLifecycleOwner) {
+            binding.ludoBoardForeground.setSelectablePawns(it)
+        }
+
         val players = viewModel.getAllPlayers()
         for (player in players) {
             for (pawn in player.pawns) {

@@ -10,6 +10,7 @@ import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
+import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.DecelerateInterpolator
 import androidx.appcompat.content.res.AppCompatResources
 import com.example.simpleludogame.R
@@ -27,6 +28,7 @@ class LudoBoardForeGroundView @JvmOverloads constructor(
 
     companion object {
         const val PAWN_MOVE_ANIMATION_DURATION_MS = 100L
+        const val PULSE_ANIMATION_DURATION_MS = 600L
     }
 
     private val gridSize = 15
@@ -52,6 +54,10 @@ class LudoBoardForeGroundView @JvmOverloads constructor(
     private var animEndY = 0f
     private var animFraction = 1f
 
+    private var pulseAnimator: ValueAnimator? = null
+    private var pulseScale = 1f
+    private var selectablePawns: List<Pawn> = emptyList()
+
     init {
         setBackgroundColor(Color.TRANSPARENT)
         isClickable = true
@@ -71,7 +77,35 @@ class LudoBoardForeGroundView @JvmOverloads constructor(
         moveAnimator?.cancel()
         moveAnimator = null
         animatingPawn = null
+        pulseAnimator?.cancel()
+        pulseAnimator = null
         super.onDetachedFromWindow()
+    }
+    
+    fun setSelectablePawns(selectablePawns: List<Pawn>) {
+        this.selectablePawns = selectablePawns
+        animateSelectedPawns()
+    }
+    
+    fun animateSelectedPawns() {
+        pulseAnimator?.cancel()
+        if (selectablePawns.isEmpty()) {
+            pulseScale = 1f
+            invalidate()
+            return
+        }
+
+        pulseAnimator = ValueAnimator.ofFloat(1f, 1.5f).apply {
+            duration = PULSE_ANIMATION_DURATION_MS
+            repeatMode = ValueAnimator.REVERSE
+            repeatCount = ValueAnimator.INFINITE
+            interpolator = AccelerateDecelerateInterpolator()
+            addUpdateListener {
+                pulseScale = it.animatedValue as Float
+                invalidate()
+            }
+            start()
+        }
     }
 
     fun updatePawn(pawn: Pawn) {
@@ -150,7 +184,7 @@ class LudoBoardForeGroundView @JvmOverloads constructor(
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         val metrics = boardMetrics() ?: return
-        val half = metrics.cellSize * 0.7f
+        val baseHalf = metrics.cellSize * 0.7f
 
         val drawOrder = pawnCellMap.keys.sortedBy { p ->
             if (p == animatingPawn) 1 else 0
@@ -160,12 +194,17 @@ class LudoBoardForeGroundView @JvmOverloads constructor(
             val (cx, cy) = drawPosition(pawn, metrics) ?: continue
             val d = drawableForPlayer(pawn.player) ?: continue
             
-            var l = (cx - half).toInt()
-            var t = (cy - half).toInt()
-            var r = (cx + half).toInt()
-            var b = (cy + half).toInt()
-            if (r <= l) r = l + 2
-            if (b <= t) b = t + 2
+            val currentHalf = if (pawn in selectablePawns) {
+                baseHalf * pulseScale
+            } else {
+                baseHalf
+            }
+            
+            val l = (cx - currentHalf).toInt()
+            val t = (cy - currentHalf).toInt()
+            val r = (cx + currentHalf).toInt()
+            val b = (cy + currentHalf).toInt()
+            
             d.setBounds(l, t, r, b)
             d.draw(canvas)
         }
