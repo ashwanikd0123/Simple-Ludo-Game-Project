@@ -22,8 +22,6 @@ class GameFragment : Fragment() {
     private val viewModel: GameViewModel by activityViewModels()
     private lateinit var binding: FragmentGameBinding
 
-    private lateinit var ludoBoard: LudoBoardForeGroundView
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
@@ -33,7 +31,6 @@ class GameFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentGameBinding.inflate(inflater, container, false)
-        ludoBoard = binding.ludoBoardForeground
 
         setListeners()
         setObservers()
@@ -43,6 +40,10 @@ class GameFragment : Fragment() {
     fun setListeners() {
         binding.diceButton.setOnClickListener {
             viewModel.rollDice()
+        }
+
+        binding.ludoBoardForeground.onPawnClickedObserver = { pawn ->
+            viewModel.movePawn(pawn)
         }
     }
 
@@ -65,9 +66,9 @@ class GameFragment : Fragment() {
         val players = viewModel.getAllPlayers()
         for (player in players) {
             for (pawn in player.pawns) {
-                ludoBoard.updatePawn(pawn)
+                binding.ludoBoardForeground.updatePawn(pawn)
                 pawn.cell.observe(viewLifecycleOwner) {
-                    ludoBoard.updatePawn(pawn)
+                    binding.ludoBoardForeground.updatePawn(pawn)
                 }
             }
         }
