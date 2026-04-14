@@ -15,17 +15,20 @@ class Cell(val row: Int, val col: Int) {
         pawns.remove(pawn)
     }
 
-    fun releaseAllPawns(except: Pawn) {
+    fun releaseAllPawns(except: Pawn): Int {
         if (type != CellType.NORMAL) {
-            return
+            return 0
         }
 
+        var res = 0
         for (pawn in pawns.toList()) {
             if (pawn.player == except.player) {
                 continue
             }
+            res++
             pawn.setCell(inHouseCell)
         }
+        return res
     }
 }
 

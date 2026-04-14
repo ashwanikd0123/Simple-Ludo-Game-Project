@@ -21,6 +21,7 @@ class GameViewModel() : ViewModel() {
     var isMoving = MutableLiveData<Boolean>(false)
     var gameEnd = MutableLiveData<Boolean>(false)
     var selectablePawns = MutableLiveData<List<Pawn>>()
+    var cutPawnCount = MutableLiveData<Int>(0)
     
     var playerRanking = 1
 
@@ -31,6 +32,7 @@ class GameViewModel() : ViewModel() {
         gameEnd.value = false
         isMoving.value = false
         selectablePawns.value = emptyList()
+        cutPawnCount.value = 0
     }
 
     fun getCurrentPlayer(): Player? {
@@ -79,7 +81,7 @@ class GameViewModel() : ViewModel() {
                 delay(LudoBoardForeGroundView.PAWN_MOVE_ANIMATION_DURATION_MS.toLong() + 100L)
             }
 
-            currentPlayer.resolveNextCell(pawn)
+            cutPawnCount.value = currentPlayer.resolveNextCell(pawn)
             currentPlayer.moveOneUnit(pawn)
 
             // short delay before next move
@@ -87,12 +89,17 @@ class GameViewModel() : ViewModel() {
 
             var shouldMoveToNextPlayer = true
 
-            // dice should not move when last number was 6 or pawn reached goal
+            // if was able to cut pawn then player will get second chance
+            if (cutPawnCount.value!! > 0) {
+                shouldMoveToNextPlayer = false
+            }
+
+            // when last number was 6 or pawn reached goal player gets second chance
             if (pawn.cell.value?.type == CellType.GOAL || num == 6) {
                 shouldMoveToNextPlayer = false
             }
 
-            // dice should move when player has won
+            // if player has won then move to next player
             if (currentPlayer.hasWon()) {
                 playerRanking++
                 when (playerRanking) {

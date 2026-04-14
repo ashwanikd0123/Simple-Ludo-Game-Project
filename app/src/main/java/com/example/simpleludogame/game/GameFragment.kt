@@ -47,10 +47,6 @@ class GameFragment : Fragment() {
 
     fun setListeners() {
         binding.diceButton.setOnClickListener {
-            if (viewModel.isMoving.value!!) {
-                return@setOnClickListener
-            }
-            diceRollMediaPlayer.start()
             viewModel.rollDice()
         }
 
@@ -61,7 +57,7 @@ class GameFragment : Fragment() {
 
     fun setObservers() {
         viewModel.diceVal.observe(viewLifecycleOwner) {
-
+            diceRollMediaPlayer.start()
             binding.diceButton.foreground = ContextCompat.getDrawable(requireContext(), getDrawableResource(it))
         }
 

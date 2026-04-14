@@ -91,11 +91,12 @@ class Player(val colors: PlayerColors, val startCell: Cell, val invalidCell: Cel
         updateStatus()
     }
 
-    fun resolveNextCell(pawn: Pawn) {
+    fun resolveNextCell(pawn: Pawn): Int {
         pawn.getCell()?.let { cell ->
             val next = if (cell == inHouseCell) startCell else getNextCell(cell)
-            next.releaseAllPawns(pawn)
+            return next.releaseAllPawns(pawn)
         }
+        return 0
     }
 
     fun updateStatus() {
