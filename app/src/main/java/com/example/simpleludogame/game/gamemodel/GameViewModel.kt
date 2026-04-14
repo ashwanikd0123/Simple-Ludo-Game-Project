@@ -76,9 +76,11 @@ class GameViewModel() : ViewModel() {
         val moves = currentPlayer.getNumberOfMoves(pawn, num)
 
         viewModelScope.launch {
+            delay(500L)
+
             for (i in 1..(moves - 1)) {
                 currentPlayer.moveOneUnit(pawn)
-                delay(LudoBoardForeGroundView.PAWN_MOVE_ANIMATION_DURATION_MS.toLong() + 100L)
+                delay(LudoBoardForeGroundView.PAWN_MOVE_ANIMATION_DURATION_MS.toLong() + 200L)
             }
 
             cutPawnCount.value = currentPlayer.resolveNextCell(pawn)

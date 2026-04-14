@@ -27,7 +27,7 @@ class LudoBoardForeGroundView @JvmOverloads constructor(
 ) : View(context, attrs, defStyleAttr) {
 
     companion object {
-        const val PAWN_MOVE_ANIMATION_DURATION_MS = 100L
+        const val PAWN_MOVE_ANIMATION_DURATION_MS = 300L
         const val PULSE_ANIMATION_DURATION_MS = 600L
     }
 

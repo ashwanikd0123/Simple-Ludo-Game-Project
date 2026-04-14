@@ -23,7 +23,12 @@ class GameFragment : Fragment() {
     private val viewModel: GameViewModel by activityViewModels()
     private lateinit var binding: FragmentGameBinding
 
+    private var isSoundOn: Boolean = true
+
     private lateinit var diceRollMediaPlayer: MediaPlayer
+    private lateinit var pawnMovementPlayer: MediaPlayer
+    private lateinit var pawnCutPlayer: MediaPlayer
+    private lateinit var pawnEnterGoalPlayer: MediaPlayer
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,6 +48,7 @@ class GameFragment : Fragment() {
 
     fun initPlayers() {
         diceRollMediaPlayer = MediaPlayer.create(requireContext(), R.raw.dice_roll)
+        pawnMovementPlayer = MediaPlayer.create(requireContext(), R.raw.pawn_move)
     }
 
     fun setListeners() {
@@ -57,7 +63,9 @@ class GameFragment : Fragment() {
 
     fun setObservers() {
         viewModel.diceVal.observe(viewLifecycleOwner) {
-            diceRollMediaPlayer.start()
+            if (isSoundOn) {
+                diceRollMediaPlayer.start()
+            }
             binding.diceButton.foreground = ContextCompat.getDrawable(requireContext(), getDrawableResource(it))
         }
 
@@ -81,6 +89,7 @@ class GameFragment : Fragment() {
             for (pawn in player.pawns) {
                 binding.ludoBoardForeground.updatePawn(pawn)
                 pawn.cell.observe(viewLifecycleOwner) {
+                    pawnMovementPlayer.start()
                     binding.ludoBoardForeground.updatePawn(pawn)
                 }
             }
