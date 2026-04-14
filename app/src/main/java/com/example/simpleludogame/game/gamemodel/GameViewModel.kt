@@ -106,6 +106,8 @@ class GameViewModel() : ViewModel() {
 
             if (shouldMoveToNextPlayer) {
                 moveNextPlayer()
+            } else {
+                isMoving.value = false
             }
         }
 
