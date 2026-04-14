@@ -45,14 +45,14 @@ class GameViewModel() : ViewModel() {
         val num = Dice.getRandomNumber()
         diceVal.value = num
 
+        isMoving.value = true
+
         val currentPlayer = gameModel.getCurrentPlayer() ?: return
         val movablePawns = currentPlayer.canMove(num)
         if (movablePawns.isEmpty()) {
-            isMoving.value = true
             viewModelScope.launch {
-                delay(LudoBoardForeGroundView.PAWN_MOVE_ANIMATION_DURATION_MS.toLong() + 100L)
+                delay(LudoBoardForeGroundView.PAWN_MOVE_ANIMATION_DURATION_MS.toLong() + 500L)
                 moveNextPlayer()
-                isMoving.postValue(false)
             }
             return
         }
@@ -73,8 +73,6 @@ class GameViewModel() : ViewModel() {
         val currentPlayer = gameModel.getCurrentPlayer() ?: return
         val moves = currentPlayer.getNumberOfMoves(pawn, num)
 
-        isMoving.value = true
-
         viewModelScope.launch {
             for (i in 1..(moves - 1)) {
                 currentPlayer.moveOneUnit(pawn)
@@ -86,8 +84,6 @@ class GameViewModel() : ViewModel() {
 
             // short delay before next move
             delay(LudoBoardForeGroundView.PAWN_MOVE_ANIMATION_DURATION_MS.toLong() + 200L)
-
-            isMoving.postValue(false)
 
             var shouldMoveToNextPlayer = true
 
@@ -119,6 +115,7 @@ class GameViewModel() : ViewModel() {
     private fun moveNextPlayer() {
         gameEnd.value = gameModel.gameEnd()
         gameModel.moveToNextPlayer()
+        isMoving.postValue(false)
     }
 
     fun getAllPlayers(): Array<Player> {

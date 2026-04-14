@@ -1,6 +1,7 @@
 package com.example.simpleludogame.game
 
 import android.content.res.Configuration
+import android.media.MediaPlayer
 import android.os.Bundle
 import android.transition.TransitionManager
 import android.view.LayoutInflater
@@ -22,6 +23,8 @@ class GameFragment : Fragment() {
     private val viewModel: GameViewModel by activityViewModels()
     private lateinit var binding: FragmentGameBinding
 
+    private lateinit var diceRollMediaPlayer: MediaPlayer
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
@@ -32,13 +35,22 @@ class GameFragment : Fragment() {
     ): View {
         binding = FragmentGameBinding.inflate(inflater, container, false)
 
+        initPlayers()
         setListeners()
         setObservers()
         return binding.root
     }
 
+    fun initPlayers() {
+        diceRollMediaPlayer = MediaPlayer.create(requireContext(), R.raw.dice_roll)
+    }
+
     fun setListeners() {
         binding.diceButton.setOnClickListener {
+            if (viewModel.isMoving.value!!) {
+                return@setOnClickListener
+            }
+            diceRollMediaPlayer.start()
             viewModel.rollDice()
         }
 
@@ -49,6 +61,7 @@ class GameFragment : Fragment() {
 
     fun setObservers() {
         viewModel.diceVal.observe(viewLifecycleOwner) {
+
             binding.diceButton.foreground = ContextCompat.getDrawable(requireContext(), getDrawableResource(it))
         }
 
