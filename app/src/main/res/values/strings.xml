@@ -10,4 +10,5 @@
     <string name="rank_3">3rd Place</string>
     <string name="rank_4">4th Place</string>
     <string name="player_format">Player %s</string>
+    <string name="roll_dice">Roll Dice</string>
 </resources>

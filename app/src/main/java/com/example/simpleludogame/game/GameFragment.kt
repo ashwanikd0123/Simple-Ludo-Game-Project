@@ -8,7 +8,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintSet
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -16,7 +15,6 @@ import com.example.simpleludogame.R
 import com.example.simpleludogame.databinding.FragmentGameBinding
 import com.example.simpleludogame.game.gamemodel.GameViewModel
 import com.example.simpleludogame.game.gamemodel.ludomodel.player.PlayerColors
-import com.example.simpleludogame.ludoboardui.LudoBoardForeGroundView
 
 class GameFragment : Fragment() {
 
@@ -29,10 +27,6 @@ class GameFragment : Fragment() {
     private lateinit var pawnMovementPlayer: MediaPlayer
     private lateinit var pawnCutPlayer: MediaPlayer
     private lateinit var pawnEnterGoalPlayer: MediaPlayer
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -68,7 +62,8 @@ class GameFragment : Fragment() {
             if (isSoundOn) {
                 diceRollMediaPlayer.start()
             }
-            binding.diceButton.foreground = ContextCompat.getDrawable(requireContext(), getDrawableResource(it))
+            // Update the ImageButton source
+            binding.diceButton.setImageResource(getDrawableResource(it))
         }
 
         viewModel.currentPlayer.observe(viewLifecycleOwner) { playerIndex ->
@@ -168,7 +163,7 @@ class GameFragment : Fragment() {
         constraintSet.applyTo(constraintLayout)
     }
 
-    fun getDrawableResource(diceVal: Int): Int {
+    private fun getDrawableResource(diceVal: Int): Int {
         return when (diceVal) {
             1 -> R.drawable.dice_1
             2 -> R.drawable.dice_2

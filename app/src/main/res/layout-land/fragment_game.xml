@@ -32,16 +32,18 @@
                 android:elevation="4dp" />
         </FrameLayout>
 
-        <Button
+        <ImageButton
             android:id="@+id/dice_button"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:background="@drawable/dice_1"
-            android:foreground="@drawable/dice_1"
-            android:shadowRadius="16"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/dice_1"
+            android:scaleType="fitCenter"
+            android:stateListAnimator="@animator/dice_click"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            android:contentDescription="@string/roll_dice"/>
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
