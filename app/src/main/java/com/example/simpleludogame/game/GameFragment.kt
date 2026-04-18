@@ -49,6 +49,8 @@ class GameFragment : Fragment() {
     fun initPlayers() {
         diceRollMediaPlayer = MediaPlayer.create(requireContext(), R.raw.dice_roll)
         pawnMovementPlayer = MediaPlayer.create(requireContext(), R.raw.pawn_move)
+        pawnCutPlayer = MediaPlayer.create(requireContext(), R.raw.pawn_cut)
+        pawnEnterGoalPlayer = MediaPlayer.create(requireContext(), R.raw.pawn_enter_goal)
     }
 
     fun setListeners() {
@@ -82,6 +84,20 @@ class GameFragment : Fragment() {
 
         viewModel.selectablePawns.observe(viewLifecycleOwner) {
             binding.ludoBoardForeground.setSelectablePawns(it)
+        }
+
+        viewModel.cutPawnCount.observe(viewLifecycleOwner) {
+            if (it <= 0 || !isSoundOn) {
+                return@observe
+            }
+            pawnCutPlayer.start()
+        }
+
+        viewModel.pawnEnteredGoal.observe(viewLifecycleOwner) {
+            if (!it || !isSoundOn) {
+                return@observe
+            }
+            pawnEnterGoalPlayer.start()
         }
 
         val players = viewModel.getAllPlayers()

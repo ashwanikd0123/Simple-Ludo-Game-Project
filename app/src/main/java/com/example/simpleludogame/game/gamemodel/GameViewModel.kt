@@ -22,6 +22,7 @@ class GameViewModel() : ViewModel() {
     var gameEnd = MutableLiveData<Boolean>(false)
     var selectablePawns = MutableLiveData<List<Pawn>>()
     var cutPawnCount = MutableLiveData<Int>(0)
+    var pawnEnteredGoal = MutableLiveData<Boolean>(false)
     
     var playerRanking = 1
 
@@ -80,14 +81,18 @@ class GameViewModel() : ViewModel() {
 
             for (i in 1..(moves - 1)) {
                 currentPlayer.moveOneUnit(pawn)
-                delay(LudoBoardForeGroundView.PAWN_MOVE_ANIMATION_DURATION_MS.toLong() + 200L)
+                delay(LudoBoardForeGroundView.PAWN_MOVE_ANIMATION_DURATION_MS.toLong() + 50L)
             }
 
             cutPawnCount.value = currentPlayer.resolveNextCell(pawn)
             currentPlayer.moveOneUnit(pawn)
 
+            if (pawn.cell.value?.type == CellType.GOAL) {
+                pawnEnteredGoal.value = true
+            }
+
             // short delay before next move
-            delay(LudoBoardForeGroundView.PAWN_MOVE_ANIMATION_DURATION_MS.toLong() + 200L)
+            delay(LudoBoardForeGroundView.PAWN_MOVE_ANIMATION_DURATION_MS.toLong() + 100L)
 
             var shouldMoveToNextPlayer = true
 

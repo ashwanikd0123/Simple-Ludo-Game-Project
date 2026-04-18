@@ -11,7 +11,7 @@ class Dice {
             }
 
             sixCount++
-            if (sixCount == 4) {
+            if (sixCount == 3) {
                 sixCount = 0
                 return  (Math.random() * 5.0 + 1.0).toInt()
             }
