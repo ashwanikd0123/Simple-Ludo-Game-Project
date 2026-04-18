@@ -65,10 +65,24 @@
                     android:spinnerMode="dropdown" />
 
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/play_button"
+                    android:id="@+id/resume_button"
                     android:layout_width="match_parent"
                     android:layout_height="64dp"
                     android:layout_marginTop="32dp"
+                    android:text="Resume"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.1"
+                    android:visibility="gone"
+                    app:backgroundTint="@color/button_green"
+                    app:cornerRadius="16dp"
+                    app:elevation="4dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/play_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="64dp"
+                    android:layout_marginTop="16dp"
                     android:letterSpacing="0.1"
                     android:text="@string/play"
                     android:textSize="20sp"

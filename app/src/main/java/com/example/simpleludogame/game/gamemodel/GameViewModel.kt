@@ -5,16 +5,16 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.simpleludogame.game.gamemodel.dicemodel.Dice
-import com.example.simpleludogame.game.gamemodel.ludomodel.cell.CellType
 import com.example.simpleludogame.game.gamemodel.ludomodel.pawn.Pawn
 import com.example.simpleludogame.game.gamemodel.ludomodel.player.Player
 import com.example.simpleludogame.game.gamemodel.ludomodel.player.PlayerStatus
+import com.example.simpleludogame.game.gamemodel.ludomodel.cell.CellType
 import com.example.simpleludogame.ludoboardui.LudoBoardForeGroundView
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class GameViewModel() : ViewModel() {
-    private lateinit var gameModel: GameModel
+    private var gameModel: GameModel? = null
 
     lateinit var currentPlayer: LiveData<Int>
     var diceVal = MutableLiveData<Int>(1)
@@ -28,16 +28,23 @@ class GameViewModel() : ViewModel() {
 
     fun initGame(playerCount: Int) {
         gameModel = GameModel(playerCount)
-        currentPlayer = gameModel.currentPlayer
+        currentPlayer = gameModel!!.currentPlayer
         playerRanking = 0
         gameEnd.value = false
         isMoving.value = false
         selectablePawns.value = emptyList()
         cutPawnCount.value = 0
     }
+    
+    fun hasPrevGameEnded(): Boolean {
+        gameModel?.let { 
+            return it.gameEnd()
+        }
+        return true
+    }
 
     fun getCurrentPlayer(): Player? {
-        return gameModel.getCurrentPlayer()
+        return gameModel?.getCurrentPlayer()
     }
 
     fun rollDice() {
@@ -50,7 +57,7 @@ class GameViewModel() : ViewModel() {
 
         isMoving.value = true
 
-        val currentPlayer = gameModel.getCurrentPlayer() ?: return
+        val currentPlayer = gameModel?.getCurrentPlayer() ?: return
         val movablePawns = currentPlayer.canMove(num)
         if (movablePawns.isEmpty()) {
             viewModelScope.launch {
@@ -73,7 +80,7 @@ class GameViewModel() : ViewModel() {
         }
 
         val num = diceVal.value!!
-        val currentPlayer = gameModel.getCurrentPlayer() ?: return
+        val currentPlayer = gameModel?.getCurrentPlayer() ?: return
         val moves = currentPlayer.getNumberOfMoves(pawn, num)
 
         viewModelScope.launch {
@@ -129,12 +136,12 @@ class GameViewModel() : ViewModel() {
     }
 
     private fun moveNextPlayer() {
-        gameEnd.value = gameModel.gameEnd()
-        gameModel.moveToNextPlayer()
+        gameEnd.value = gameModel?.gameEnd()
+        gameModel?.moveToNextPlayer()
         isMoving.postValue(false)
     }
 
     fun getAllPlayers(): Array<Player> {
-        return gameModel.players
+        return gameModel?.players ?: emptyArray()
     }
 }

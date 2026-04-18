@@ -22,6 +22,14 @@ class HomeFragment : Fragment() {
     ): View {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
 
+        if (!viewModel.hasPrevGameEnded()) {
+            binding.resumeButton.visibility = View.VISIBLE
+        }
+
+        binding.resumeButton.setOnClickListener {
+            findNavController().navigate(R.id.action_homeFragment_to_gameFragment)
+        }
+
         binding.playButton.setOnClickListener {
             // Spinner positions: 0 -> 2 players, 1 -> 3 players, 2 -> 4 players
             val playerCount = binding.playerCountSpinner.selectedItemPosition + 2
