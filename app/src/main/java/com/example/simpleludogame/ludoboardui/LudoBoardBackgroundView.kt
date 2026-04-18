@@ -191,13 +191,13 @@ class LudoBoardBackgroundView @JvmOverloads constructor(
         }
 
         cellPaint.color = greenColor
-        canvas.drawPath(topTriangle, cellPaint)
-        cellPaint.color = redColor
-        canvas.drawPath(rightTriangle, cellPaint)
-        cellPaint.color = blueColor
-        canvas.drawPath(bottomTriangle, cellPaint)
-        cellPaint.color = yellowColor
         canvas.drawPath(leftTriangle, cellPaint)
+        cellPaint.color = redColor
+        canvas.drawPath(bottomTriangle, cellPaint)
+        cellPaint.color = blueColor
+        canvas.drawPath(rightTriangle, cellPaint)
+        cellPaint.color = yellowColor
+        canvas.drawPath(topTriangle, cellPaint)
 
         canvas.drawRect(RectF(goalLeft, goalTop, goalRight, goalBottom), strokePaint)
         canvas.drawLine(goalLeft, goalTop, goalRight, goalBottom, strokePaint)
