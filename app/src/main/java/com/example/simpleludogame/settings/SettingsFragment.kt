@@ -12,6 +12,7 @@ import com.example.simpleludogame.databinding.FragmentSettingsBinding
 import com.example.simpleludogame.game.MediaManager
 import com.example.simpleludogame.game.gamemodel.GameConstants
 import com.example.simpleludogame.game.gamemodel.dicemodel.Dice
+import androidx.core.content.edit
 
 val SETTINGS_KEY = "game_settings"
 
@@ -42,14 +43,19 @@ class SettingsFragment : Fragment() {
                 ),
                 sharedPrefs.getInt(Dice.DICE_BEHAVIOR_KEY, 0)
             ) { index ->
-                sharedPrefs.edit().putInt(Dice.DICE_BEHAVIOR_KEY, index).apply()
+                sharedPrefs.edit { putInt(Dice.DICE_BEHAVIOR_KEY, index) }
             },
             SettingItem.Option(
                 getString(R.string.cut_gives_bonus),
                 listOf(getString(R.string.off), getString(R.string.on)),
                 if (sharedPrefs.getBoolean(GameConstants.BONUS_CHANCE_ON_PLAYER_CUT_KEY, true)) 1 else 0
             ) { index ->
-                sharedPrefs.edit().putBoolean(GameConstants.BONUS_CHANCE_ON_PLAYER_CUT_KEY, index == 1).apply()
+                sharedPrefs.edit {
+                    putBoolean(
+                        GameConstants.BONUS_CHANCE_ON_PLAYER_CUT_KEY,
+                        index == 1
+                    )
+                }
             },
             SettingItem.Header(getString(R.string.audio_feel_settings_header)),
             SettingItem.Option(
@@ -57,21 +63,21 @@ class SettingsFragment : Fragment() {
                 listOf(getString(R.string.off), getString(R.string.on)),
                 if (sharedPrefs.getBoolean(MediaManager.SOUND_KEY, true)) 1 else 0
             ) { index ->
-                sharedPrefs.edit().putBoolean(MediaManager.SOUND_KEY, index == 1).apply()
+                sharedPrefs.edit { putBoolean(MediaManager.SOUND_KEY, index == 1) }
             },
             SettingItem.Option(
                 getString(R.string.vibration),
                 listOf(getString(R.string.off), getString(R.string.on)),
                 if (sharedPrefs.getBoolean(MediaManager.VIBRATION_KEY, true)) 1 else 0
             ) { index ->
-                sharedPrefs.edit().putBoolean(MediaManager.VIBRATION_KEY, index == 1).apply()
+                sharedPrefs.edit { putBoolean(MediaManager.VIBRATION_KEY, index == 1) }
             },
             SettingItem.Option(
                 getString(R.string.dark_mode),
                 listOf(getString(R.string.system), getString(R.string.off), getString(R.string.on)),
                 sharedPrefs.getInt(GameConstants.DARK_MODE_KEY, 0)
             ) { index ->
-                sharedPrefs.edit().putInt(GameConstants.DARK_MODE_KEY, index).apply()
+                sharedPrefs.edit { putInt(GameConstants.DARK_MODE_KEY, index) }
                 updateTheme(index)
             }
         )
