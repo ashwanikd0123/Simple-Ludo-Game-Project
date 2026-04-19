@@ -7,6 +7,7 @@ import android.transition.TransitionManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -30,7 +31,16 @@ class GameFragment : Fragment() {
         mediaManager = MediaManager(requireContext())
         setListeners()
         setObservers()
+        checkDeveloperMode()
         return binding.root
+    }
+
+    private fun checkDeveloperMode() {
+        if (viewModel.gameConstants.developerModeActive) {
+            binding.developerPanel.visibility = View.VISIBLE
+        } else {
+            binding.developerPanel.visibility = View.GONE
+        }
     }
 
     fun setListeners() {
@@ -40,6 +50,18 @@ class GameFragment : Fragment() {
 
         binding.ludoBoardForeground.onPawnClickedObserver = { pawn ->
             viewModel.movePawn(pawn)
+        }
+
+        binding.devRollButton.setOnClickListener {
+            val text = binding.devDiceValue.text.toString()
+            if (text.isNotEmpty()) {
+                val num = text.toIntOrNull()
+                if (num != null && num in 1..6) {
+                    viewModel.rollDiceCustom(num)
+                } else {
+                    Toast.makeText(requireContext(), "Enter number between 1-6", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
     }
 

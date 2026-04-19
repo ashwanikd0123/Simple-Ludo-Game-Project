@@ -46,6 +46,32 @@
             app:layout_constraintTop_toTopOf="parent"
             android:contentDescription="@string/roll_dice"/>
 
+        <LinearLayout
+            android:id="@+id/developer_panel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:visibility="visible">
+
+            <EditText
+                android:id="@+id/dev_dice_value"
+                android:layout_width="60dp"
+                android:layout_height="wrap_content"
+                android:hint="1-6"
+                android:inputType="number"
+                android:textAlignment="center" />
+
+            <Button
+                android:id="@+id/dev_roll_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/roll" />
+        </LinearLayout>
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

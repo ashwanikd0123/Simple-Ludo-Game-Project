@@ -74,6 +74,17 @@ class GameViewModel() : ViewModel() {
         }
 
         val num = dice.roll(currentPlayer.value!!)
+        handleRollResult(num)
+    }
+
+    fun rollDiceCustom(num: Int) {
+        if (_isMoving.value ?: true) {
+            return
+        }
+        handleRollResult(num)
+    }
+
+    private fun handleRollResult(num: Int) {
         if (num == 0) {
             _playerChanceCut.value = true
             moveNextPlayer()

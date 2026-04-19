@@ -32,7 +32,7 @@ class SettingsFragment : Fragment() {
     private fun setupSettingsList() {
         val sharedPrefs = requireContext().getSharedPreferences(SETTINGS_KEY, Context.MODE_PRIVATE)
         
-        val items = listOf(
+        val items = mutableListOf(
             SettingItem.Header(getString(R.string.game_settings_header)),
             SettingItem.Option(
                 getString(R.string.three_sixes_rule),
@@ -53,6 +53,18 @@ class SettingsFragment : Fragment() {
                 sharedPrefs.edit {
                     putBoolean(
                         GameConstants.BONUS_CHANCE_ON_PLAYER_CUT_KEY,
+                        index == 1
+                    )
+                }
+            },
+            SettingItem.Option(
+                getString(R.string.developer_mode),
+                listOf(getString(R.string.off), getString(R.string.on)),
+                if (sharedPrefs.getBoolean(GameConstants.DEVELOPER_MODE_KEY, false)) 1 else 0
+            ) { index ->
+                sharedPrefs.edit {
+                    putBoolean(
+                        GameConstants.DEVELOPER_MODE_KEY,
                         index == 1
                     )
                 }
