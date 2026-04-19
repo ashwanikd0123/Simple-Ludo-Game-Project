@@ -36,11 +36,16 @@ class GameViewModel() : ViewModel() {
 
     private val _pawnEnteredGoal = MutableLiveData<Boolean>(false)
     val pawnEnteredGoal: LiveData<Boolean> = _pawnEnteredGoal
+
+    private val _playerChanceCut = MutableLiveData<Boolean>(false)
+    val playerChanceCut: LiveData<Boolean> = _playerChanceCut
     
     var playerRanking = 1
+    lateinit var dice: Dice
 
     fun initGame(playerCount: Int) {
         gameModel = GameModel(playerCount)
+        dice = Dice()
         playerRanking = 0
         _gameEnd.value = false
         _isMoving.value = false
@@ -65,7 +70,13 @@ class GameViewModel() : ViewModel() {
             return
         }
 
-        val num = Dice.getRandomNumber()
+        val num = dice.roll(currentPlayer.value!!)
+        if (num == 0) {
+            _playerChanceCut.value = true
+            moveNextPlayer()
+            return
+        }
+
         _diceVal.value = num
 
         _isMoving.value = true
