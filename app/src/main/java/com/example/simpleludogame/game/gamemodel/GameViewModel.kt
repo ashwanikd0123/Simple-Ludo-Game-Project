@@ -16,24 +16,37 @@ import kotlinx.coroutines.launch
 class GameViewModel() : ViewModel() {
     private var gameModel: GameModel? = null
 
-    lateinit var currentPlayer: LiveData<Int>
-    var diceVal = MutableLiveData<Int>(1)
-    var isMoving = MutableLiveData<Boolean>(false)
-    var gameEnd = MutableLiveData<Boolean>(false)
-    var selectablePawns = MutableLiveData<List<Pawn>>()
-    var cutPawnCount = MutableLiveData<Int>(0)
-    var pawnEnteredGoal = MutableLiveData<Boolean>(false)
+    private val _currentPlayer = MutableLiveData<Int>()
+    val currentPlayer: LiveData<Int> = _currentPlayer
+
+    private val _diceVal = MutableLiveData<Int>(1)
+    val diceVal: LiveData<Int> = _diceVal
+
+    private val _isMoving = MutableLiveData<Boolean>(false)
+    val isMoving: LiveData<Boolean> = _isMoving
+
+    private val _gameEnd = MutableLiveData<Boolean>(false)
+    val gameEnd: LiveData<Boolean> = _gameEnd
+
+    private val _selectablePawns = MutableLiveData<List<Pawn>>(emptyList())
+    val selectablePawns: LiveData<List<Pawn>> = _selectablePawns
+
+    private val _cutPawnCount = MutableLiveData<Int>(0)
+    val cutPawnCount: LiveData<Int> = _cutPawnCount
+
+    private val _pawnEnteredGoal = MutableLiveData<Boolean>(false)
+    val pawnEnteredGoal: LiveData<Boolean> = _pawnEnteredGoal
     
     var playerRanking = 1
 
     fun initGame(playerCount: Int) {
         gameModel = GameModel(playerCount)
-        currentPlayer = gameModel!!.currentPlayer
         playerRanking = 0
-        gameEnd.value = false
-        isMoving.value = false
-        selectablePawns.value = emptyList()
-        cutPawnCount.value = 0
+        _gameEnd.value = false
+        _isMoving.value = false
+        _selectablePawns.value = emptyList()
+        _cutPawnCount.value = 0
+        updateCurrentPlayer()
     }
     
     fun hasPrevGameEnded(): Boolean {
@@ -48,14 +61,14 @@ class GameViewModel() : ViewModel() {
     }
 
     fun rollDice() {
-        if (isMoving.value ?: true) {
+        if (_isMoving.value ?: true) {
             return
         }
 
         val num = Dice.getRandomNumber()
-        diceVal.value = num
+        _diceVal.value = num
 
-        isMoving.value = true
+        _isMoving.value = true
 
         val currentPlayer = gameModel?.getCurrentPlayer() ?: return
         val movablePawns = currentPlayer.canMove(num)
@@ -67,35 +80,41 @@ class GameViewModel() : ViewModel() {
             return
         }
 
-        selectablePawns.value = movablePawns
+        _selectablePawns.value = movablePawns
 
         if (movablePawns.size == 1) {
             movePawn(movablePawns[0])
         }
     }
 
+    fun updateCurrentPlayer() {
+        gameModel?.let {
+            _currentPlayer.value = it.currentPlayer
+        }
+    }
+
     fun movePawn(pawn: Pawn) {
-        if (!selectablePawns.value!!.contains(pawn)) {
+        if (!_selectablePawns.value!!.contains(pawn)) {
             return
         }
 
-        val num = diceVal.value!!
+        val num = _diceVal.value!!
         val currentPlayer = gameModel?.getCurrentPlayer() ?: return
         val moves = currentPlayer.getNumberOfMoves(pawn, num)
 
         viewModelScope.launch {
             delay(500L)
 
-            for (i in 1..(moves - 1)) {
+            for (i in 1..<moves) {
                 currentPlayer.moveOneUnit(pawn)
                 delay(LudoBoardForeGroundView.PAWN_MOVE_ANIMATION_DURATION_MS.toLong() + 50L)
             }
 
-            cutPawnCount.value = currentPlayer.resolveNextCell(pawn)
+            _cutPawnCount.value = currentPlayer.resolveNextCell(pawn)
             currentPlayer.moveOneUnit(pawn)
 
             if (pawn.cell.value?.type == CellType.GOAL) {
-                pawnEnteredGoal.value = true
+                _pawnEnteredGoal.value = true
             }
 
             // short delay before next move
@@ -104,7 +123,7 @@ class GameViewModel() : ViewModel() {
             var shouldMoveToNextPlayer = true
 
             // if was able to cut pawn then player will get second chance
-            if (cutPawnCount.value!! > 0) {
+            if (_cutPawnCount.value!! > 0) {
                 shouldMoveToNextPlayer = false
             }
 
@@ -128,17 +147,18 @@ class GameViewModel() : ViewModel() {
             if (shouldMoveToNextPlayer) {
                 moveNextPlayer()
             } else {
-                isMoving.value = false
+                _isMoving.value = false
             }
         }
 
-        selectablePawns.value = emptyList()
+        _selectablePawns.value = emptyList()
     }
 
     private fun moveNextPlayer() {
-        gameEnd.value = gameModel?.gameEnd()
+        _gameEnd.value = gameModel?.gameEnd()
         gameModel?.moveToNextPlayer()
-        isMoving.postValue(false)
+        updateCurrentPlayer()
+        _isMoving.postValue(false)
     }
 
     fun getAllPlayers(): Array<Player> {

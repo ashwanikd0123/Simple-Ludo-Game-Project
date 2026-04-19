@@ -26,7 +26,7 @@ class GameModel(val playerCount: Int) {
 
     lateinit var players: Array<Player>
 
-    var currentPlayer = MutableLiveData<Int>(0)
+    var currentPlayer = 0
 
     fun initPlayers() {
         when (playerCount) {
@@ -159,7 +159,7 @@ class GameModel(val playerCount: Int) {
     }
 
     fun moveToNextPlayer(): Boolean {
-        var curValue = (currentPlayer.value!! + 1) % players.size
+        var curValue = (currentPlayer + 1) % players.size
         var count = 0
         while (players[curValue].getStatus() != PlayerStatus.PLAYING) {
             curValue = (curValue + 1) % players.size
@@ -168,12 +168,11 @@ class GameModel(val playerCount: Int) {
                 return false
             }
         }
-        currentPlayer.value = curValue
+        currentPlayer = curValue
         return true
     }
 
-    fun getCurrentPlayer(): Player? {
-        currentPlayer.value?.let { return players[it] }
-        return null
+    fun getCurrentPlayer(): Player {
+        return players[currentPlayer]
     }
 }
