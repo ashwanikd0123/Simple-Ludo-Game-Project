@@ -39,6 +39,7 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/dice_1"
             android:scaleType="fitCenter"
+            android:elevation="12dp"
             android:stateListAnimator="@animator/dice_click"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

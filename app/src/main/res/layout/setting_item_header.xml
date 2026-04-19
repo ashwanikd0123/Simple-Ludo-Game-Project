@@ -6,5 +6,5 @@
     android:padding="16dp"
     android:textSize="18sp"
     android:textStyle="bold"
-    android:textColor="@color/text_on_background"
+    android:textColor="?attr/colorOnSurface"
     android:background="#10000000" />
