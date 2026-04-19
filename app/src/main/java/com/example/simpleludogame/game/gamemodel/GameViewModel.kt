@@ -1,5 +1,6 @@
 package com.example.simpleludogame.game.gamemodel
 
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -42,10 +43,12 @@ class GameViewModel() : ViewModel() {
     
     var playerRanking = 1
     lateinit var dice: Dice
+    lateinit var gameConstants: GameConstants
 
-    fun initGame(playerCount: Int) {
+    fun initGame(context: Context, playerCount: Int) {
         gameModel = GameModel(playerCount)
-        dice = Dice()
+        dice = Dice(context)
+        gameConstants = GameConstants(context)
         playerRanking = 0
         _gameEnd.value = false
         _isMoving.value = false
@@ -134,7 +137,7 @@ class GameViewModel() : ViewModel() {
             var shouldMoveToNextPlayer = true
 
             // if was able to cut pawn then player will get second chance
-            if (_cutPawnCount.value!! > 0) {
+            if (_cutPawnCount.value!! > 0 && gameConstants.bonusChancePlayerCutActive) {
                 shouldMoveToNextPlayer = false
             }
 

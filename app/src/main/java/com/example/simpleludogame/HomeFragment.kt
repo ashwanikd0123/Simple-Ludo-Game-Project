@@ -33,8 +33,12 @@ class HomeFragment : Fragment() {
         binding.playButton.setOnClickListener {
             // Spinner positions: 0 -> 2 players, 1 -> 3 players, 2 -> 4 players
             val playerCount = binding.playerCountSpinner.selectedItemPosition + 2
-            viewModel.initGame(playerCount)
+            viewModel.initGame(requireContext(), playerCount)
             findNavController().navigate(R.id.action_homeFragment_to_gameFragment)
+        }
+
+        binding.settingsButton.setOnClickListener {
+            findNavController().navigate(R.id.action_homeFragment_to_settingsFragment)
         }
 
         return binding.root

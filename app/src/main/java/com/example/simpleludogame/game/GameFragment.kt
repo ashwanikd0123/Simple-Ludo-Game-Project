@@ -20,31 +20,17 @@ class GameFragment : Fragment() {
 
     private val viewModel: GameViewModel by activityViewModels()
     private lateinit var binding: FragmentGameBinding
-
-    private var isSoundOn: Boolean = true
-
-    private lateinit var diceRollMediaPlayer: MediaPlayer
-    private lateinit var pawnMovementPlayer: MediaPlayer
-    private lateinit var pawnCutPlayer: MediaPlayer
-    private lateinit var pawnEnterGoalPlayer: MediaPlayer
+    private lateinit var mediaManager: MediaManager
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentGameBinding.inflate(inflater, container, false)
-
-        initPlayers()
+        mediaManager = MediaManager(requireContext())
         setListeners()
         setObservers()
         return binding.root
-    }
-
-    fun initPlayers() {
-        diceRollMediaPlayer = MediaPlayer.create(requireContext(), R.raw.dice_roll)
-        pawnMovementPlayer = MediaPlayer.create(requireContext(), R.raw.pawn_move)
-        pawnCutPlayer = MediaPlayer.create(requireContext(), R.raw.pawn_cut)
-        pawnEnterGoalPlayer = MediaPlayer.create(requireContext(), R.raw.pawn_enter_goal)
     }
 
     fun setListeners() {
@@ -59,10 +45,7 @@ class GameFragment : Fragment() {
 
     fun setObservers() {
         viewModel.diceVal.observe(viewLifecycleOwner) {
-            if (isSoundOn) {
-                diceRollMediaPlayer.start()
-            }
-            // Update the ImageButton source
+            mediaManager.playMedia(binding.diceButton, MediaManager.Event.DICE_ROLL)
             binding.diceButton.setImageResource(getDrawableResource(it))
         }
 
@@ -82,17 +65,17 @@ class GameFragment : Fragment() {
         }
 
         viewModel.cutPawnCount.observe(viewLifecycleOwner) {
-            if (it <= 0 || !isSoundOn) {
+            if (it <= 0) {
                 return@observe
             }
-            pawnCutPlayer.start()
+            mediaManager.playMedia(binding.ludoBoardForeground, MediaManager.Event.PAWN_CUT)
         }
 
         viewModel.pawnEnteredGoal.observe(viewLifecycleOwner) {
-            if (!it || !isSoundOn) {
+            if (!it) {
                 return@observe
             }
-            pawnEnterGoalPlayer.start()
+            mediaManager.playMedia(binding.ludoBoardForeground, MediaManager.Event.PAWN_ENTER_GOAL)
         }
 
         val players = viewModel.getAllPlayers()
@@ -100,7 +83,7 @@ class GameFragment : Fragment() {
             for (pawn in player.pawns) {
                 binding.ludoBoardForeground.updatePawn(pawn)
                 pawn.cell.observe(viewLifecycleOwner) {
-                    pawnMovementPlayer.start()
+                    mediaManager.playMedia(binding.ludoBoardForeground, MediaManager.Event.PAWN_MOVEMENT)
                     binding.ludoBoardForeground.updatePawn(pawn)
                 }
             }

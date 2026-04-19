@@ -9,6 +9,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.example.simpleludogame.databinding.FragmentResultBinding
 import com.example.simpleludogame.databinding.ItemResultPlayerBinding
+import com.example.simpleludogame.game.MediaManager
 import com.example.simpleludogame.game.gamemodel.GameViewModel
 import com.example.simpleludogame.game.gamemodel.ludomodel.player.Player
 import com.example.simpleludogame.game.gamemodel.ludomodel.player.PlayerColors
