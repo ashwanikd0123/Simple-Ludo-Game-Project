@@ -217,6 +217,10 @@ class LudoBoardForeGroundView @JvmOverloads constructor(
             val x = event.x
             val y = event.y
             for (pawn in pawnCellMap.keys.reversed()) {
+                if (!selectablePawns.contains(pawn)) {
+                    continue
+                }
+
                 val pos = drawPosition(pawn, metrics) ?: continue
                 val dx = x - pos.first
                 val dy = y - pos.second
