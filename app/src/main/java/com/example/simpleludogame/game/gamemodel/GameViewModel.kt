@@ -40,7 +40,10 @@ class GameViewModel() : ViewModel() {
 
     private val _playerChanceCut = MutableLiveData<Boolean>(false)
     val playerChanceCut: LiveData<Boolean> = _playerChanceCut
-    
+
+    private val _starCell = MutableLiveData<Boolean>(true)
+    val starCell: LiveData<Boolean> = _starCell
+
     var playerRanking = 1
     lateinit var dice: Dice
     lateinit var gameConstants: GameConstants
@@ -49,6 +52,7 @@ class GameViewModel() : ViewModel() {
         gameModel = GameModel(playerCount)
         dice = Dice(context)
         gameConstants = GameConstants(context)
+        _starCell.value = false
         playerRanking = 0
         _gameEnd.value = false
         _isMoving.value = false
@@ -138,8 +142,13 @@ class GameViewModel() : ViewModel() {
             _cutPawnCount.value = currentPlayer.resolveNextCell(pawn)
             currentPlayer.moveOneUnit(pawn)
 
-            if (pawn.cell.value?.type == CellType.GOAL) {
+            val finalCell = pawn.cell.value!!
+
+            if (finalCell.type == CellType.GOAL) {
                 _pawnEnteredGoal.value = true
+            } else if (finalCell.type == CellType.STAR && finalCell != currentPlayer.startCell) {
+                _starCell.value = true
+                _starCell.value = false
             }
 
             // short delay before next move

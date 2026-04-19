@@ -24,13 +24,14 @@ class MediaManager(context: Context) {
     }
 
     enum class Event {
-        DICE_ROLL, PAWN_MOVEMENT, PAWN_CUT, PAWN_ENTER_GOAL
+        DICE_ROLL, PAWN_MOVEMENT, PAWN_CUT, PAWN_ENTER_GOAL, PAWN_ENTER_STAR_CELL
     }
 
     private val diceRollMediaPlayer = MediaPlayer.create(context, R.raw.dice_roll)
     private val pawnMovementPlayer = MediaPlayer.create(context, R.raw.pawn_move)
     private val pawnCutPlayer = MediaPlayer.create(context, R.raw.pawn_cut)
     private val pawnEnterGoalPlayer = MediaPlayer.create(context, R.raw.pawn_enter_goal)
+    private val pawnEnterStarPlayer = MediaPlayer.create(context, R.raw.pawn_star_cell)
 
     fun playMedia(view: View, event: Event) {
         when (event) {
@@ -38,6 +39,7 @@ class MediaManager(context: Context) {
             Event.PAWN_MOVEMENT -> pawnMovement(view)
             Event.PAWN_CUT -> pawnCut(view)
             Event.PAWN_ENTER_GOAL -> pawnEnterGoal(view)
+            Event.PAWN_ENTER_STAR_CELL -> pawnEnterStarCell(view)
         }
     }
 
@@ -74,6 +76,12 @@ class MediaManager(context: Context) {
         }
         if (isVibrationOn) {
             view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
+        }
+    }
+
+    private fun pawnEnterStarCell(view: View) {
+        if (isSoundOn) {
+            pawnEnterStarPlayer?.start()
         }
     }
 

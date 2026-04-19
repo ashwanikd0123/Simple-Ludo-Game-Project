@@ -71,6 +71,13 @@ class GameFragment : Fragment() {
             binding.diceButton.setImageResource(getDrawableResource(it))
         }
 
+        viewModel.starCell.observe(viewLifecycleOwner) {
+            if (!it) {
+                return@observe
+            }
+            mediaManager.playMedia(binding.ludoBoardForeground, MediaManager.Event.PAWN_ENTER_STAR_CELL)
+        }
+
         viewModel.currentPlayer.observe(viewLifecycleOwner) { playerIndex ->
             val player = viewModel.getAllPlayers().getOrNull(playerIndex) ?: return@observe
             updateDiceButtonPosition(player.colors)
