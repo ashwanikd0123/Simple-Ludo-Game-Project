@@ -6,6 +6,11 @@ import com.example.simpleludogame.settings.SETTINGS_KEY
 class GameConstants(context: Context) {
     companion object {
         const val BONUS_CHANCE_ON_PLAYER_CUT_KEY = "bonus_chance_on_player_cut"
+        const val DARK_MODE_KEY = "dark_mode_setting"
+
+        const val MODE_NIGHT_FOLLOW_SYSTEM = 0
+        const val MODE_LIGHT = 1
+        const val MODE_NIGHT = 2
     }
 
     val bonusChancePlayerCutActive: Boolean

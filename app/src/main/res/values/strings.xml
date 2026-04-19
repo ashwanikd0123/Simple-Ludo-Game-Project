@@ -12,6 +12,18 @@
     <string name="player_format">Player %s</string>
     <string name="roll_dice">Roll Dice</string>
     <string name="settings">Settings</string>
+    <string name="game_settings_header">Game Settings</string>
+    <string name="three_sixes_rule">Three Sixes Rule</string>
+    <string name="off">Off</string>
+    <string name="on">On</string>
+    <string name="system">System</string>
+    <string name="turn_cancel">Turn Cancel</string>
+    <string name="convert_third_six">Convert 3rd six to non-6</string>
+    <string name="cut_gives_bonus">Cut Gives Bonus Turn</string>
+    <string name="audio_feel_settings_header">Audio / Feel Settings</string>
+    <string name="sound_effects">Sound Effects</string>
+    <string name="vibration">Vibration</string>
+    <string name="dark_mode">Dark mode</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
