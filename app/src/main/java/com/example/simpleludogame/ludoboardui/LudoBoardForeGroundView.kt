@@ -5,7 +5,6 @@ import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
-import android.graphics.RectF
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.MotionEvent
@@ -63,6 +62,20 @@ class LudoBoardForeGroundView @JvmOverloads constructor(
         isClickable = true
     }
 
+    private var cachedMetrics: BoardMetrics? = null
+
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        super.onSizeChanged(w, h, oldw, oldh)
+        if (w > 0 && h > 0) {
+            val availableSize = min(w, h).toFloat()
+            val cellSize = availableSize / gridSize
+            val boardSize = cellSize * gridSize
+            val left = (w - boardSize) / 2f
+            val top = (h - boardSize) / 2f
+            cachedMetrics = BoardMetrics(left, top, cellSize)
+        }
+    }
+
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         val w = MeasureSpec.getSize(widthMeasureSpec)
         val h = MeasureSpec.getSize(heightMeasureSpec)
@@ -95,7 +108,7 @@ class LudoBoardForeGroundView @JvmOverloads constructor(
             return
         }
 
-        pulseAnimator = ValueAnimator.ofFloat(1f, 1.5f).apply {
+        pulseAnimator = ValueAnimator.ofFloat(1f, 1.25f).apply {
             duration = PULSE_ANIMATION_DURATION_MS
             repeatMode = ValueAnimator.REVERSE
             repeatCount = ValueAnimator.INFINITE
@@ -114,7 +127,7 @@ class LudoBoardForeGroundView @JvmOverloads constructor(
             post { updatePawn(pawn) }
             return
         }
-        val metrics = boardMetrics() ?: return
+        val metrics = cachedMetrics ?: return
 
         if (pawn !in pawnCellMap) {
             if (isHouse(newCell)) {
@@ -133,8 +146,9 @@ class LudoBoardForeGroundView @JvmOverloads constructor(
             return
         }
 
-        val from = positionOf(pawn, metrics)
-            ?: return
+        if (!setPositionOf(pawn, metrics, tempPoint)) return
+        val fromX = tempPoint[0]
+        val fromY = tempPoint[1]
 
         cellPawnsMap[oldCell]?.remove(pawn)
         if (cellPawnsMap[oldCell]?.isEmpty() == true) {
@@ -148,9 +162,11 @@ class LudoBoardForeGroundView @JvmOverloads constructor(
             pawnInHouseCellCoord[pawn] = allocateHomeSlot(pawn.player)
         }
 
-        val to = positionOf(pawn, metrics) ?: return
+        if (!setPositionOf(pawn, metrics, tempPoint)) return
+        val toX = tempPoint[0]
+        val toY = tempPoint[1]
 
-        if (from.first == to.first && from.second == to.second) {
+        if (fromX == toX && fromY == toY) {
             invalidate()
             return
         }
@@ -172,58 +188,76 @@ class LudoBoardForeGroundView @JvmOverloads constructor(
                 }
             })
             animatingPawn = pawn
-            animStartX = from.first
-            animStartY = from.second
-            animEndX = to.first
-            animEndY = to.second
+            animStartX = fromX
+            animStartY = fromY
+            animEndX = toX
+            animEndY = toY
             animFraction = 0f
             start()
         }
     }
 
+    private val tempPoint = FloatArray(2)
+
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        val metrics = boardMetrics() ?: return
+        val metrics = cachedMetrics ?: return
         val baseHalf = metrics.cellSize * 0.7f
 
-        val drawOrder = pawnCellMap.keys.sortedBy { p ->
-            if (p == animatingPawn) 1 else 0
+        // Draw non-animating pawns first
+        for (pawn in pawnCellMap.keys) {
+            if (pawn == animatingPawn) continue
+            drawPawn(canvas, pawn, metrics, baseHalf)
         }
+        
+        // Draw animating pawn on top
+        animatingPawn?.let {
+            drawPawn(canvas, it, metrics, baseHalf)
+        }
+    }
 
-        for (pawn in drawOrder) {
-            val (cx, cy) = drawPosition(pawn, metrics) ?: continue
-            val d = drawableForPlayer(pawn.player) ?: continue
-            
-            val currentHalf = if (pawn in selectablePawns) {
-                baseHalf * pulseScale
-            } else {
-                baseHalf
-            }
-            
-            val l = (cx - currentHalf).toInt()
-            val t = (cy - currentHalf).toInt()
-            val r = (cx + currentHalf).toInt()
-            val b = (cy + currentHalf).toInt()
-            
-            d.setBounds(l, t, r, b)
-            d.draw(canvas)
+    private fun drawPawn(canvas: Canvas, pawn: Pawn, metrics: BoardMetrics, baseHalf: Float) {
+        if (!setDrawPosition(pawn, metrics, tempPoint)) return
+        val cx = tempPoint[0]
+        val cy = tempPoint[1]
+        
+        val d = drawableForPlayer(pawn.player) ?: return
+        
+        val currentHalf = if (pawn in selectablePawns) {
+            baseHalf * pulseScale
+        } else {
+            baseHalf
         }
+        
+        val l = (cx - currentHalf).toInt()
+        val t = (cy - currentHalf).toInt()
+        val r = (cx + currentHalf).toInt()
+        val b = (cy + currentHalf).toInt()
+        
+        d.setBounds(l, t, r, b)
+        d.draw(canvas)
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
         if (event.actionMasked == MotionEvent.ACTION_UP) {
-            val metrics = boardMetrics() ?: return super.onTouchEvent(event)
+            val metrics = cachedMetrics ?: return super.onTouchEvent(event)
             val hitRadius = metrics.cellSize * 0.5f
             val x = event.x
             val y = event.y
-            for (pawn in pawnCellMap.keys.reversed()) {
+            
+            // Iterate backwards to pick the one on top
+            val keys = pawnCellMap.keys.toList().reversed()
+            for (pawn in keys) {
                 if (!selectablePawns.contains(pawn)) {
                     continue
                 }
 
-                val pos = drawPosition(pawn, metrics) ?: continue
-                val dx = x - pos.first
-                val dy = y - pos.second
+                if (!setDrawPosition(pawn, metrics, tempPoint)) continue
+                val px = tempPoint[0]
+                val py = tempPoint[1]
+                
+                val dx = x - px
+                val dy = y - py
                 if (dx * dx + dy * dy <= hitRadius * hitRadius) {
                     onPawnClickedObserver?.invoke(pawn)
                     performClick()
@@ -239,40 +273,52 @@ class LudoBoardForeGroundView @JvmOverloads constructor(
         return true
     }
 
-    private fun boardMetrics(): BoardMetrics? {
-        if (width == 0 || height == 0) return null
-        val availableSize = min(width, height).toFloat()
-        val cellSize = availableSize / gridSize
-        val boardSize = cellSize * gridSize
-        val left = (width - boardSize) / 2f
-        val top = (height - boardSize) / 2f
-        return BoardMetrics(left, top, cellSize)
-    }
-
-    private fun drawPosition(pawn: Pawn, metrics: BoardMetrics): Pair<Float, Float>? {
+    private fun setDrawPosition(pawn: Pawn, metrics: BoardMetrics, outPoint: FloatArray): Boolean {
         if (pawn == animatingPawn && moveAnimator?.isRunning == true) {
             val t = animFraction
-            return animStartX + (animEndX - animStartX) * t to
-                animStartY + (animEndY - animStartY) * t
+            outPoint[0] = animStartX + (animEndX - animStartX) * t
+            outPoint[1] = animStartY + (animEndY - animStartY) * t
+            return true
         }
-        return positionOf(pawn, metrics)
+        return setPositionOf(pawn, metrics, outPoint)
     }
 
     private fun isHouse(cell: Cell): Boolean =
         cell === inHouseCell || (cell.row == -1 && cell.col == -1)
 
-    private fun positionOf(pawn: Pawn, metrics: BoardMetrics): Pair<Float, Float>? {
-        val cell = pawnCellMap[pawn] ?: return null
+    private fun setPositionOf(pawn: Pawn, metrics: BoardMetrics, outPoint: FloatArray): Boolean {
+        val cell = pawnCellMap[pawn] ?: return false
         if (isHouse(cell)) {
             val slot = pawnInHouseCellCoord.getOrPut(pawn) { allocateHomeSlot(pawn.player) }
-            return homeCircleCenter(pawn.player, slot, metrics)
+            return setHomeCircleCenter(pawn.player, slot, metrics, outPoint)
         }
-        val list = cellPawnsMap[cell] ?: return null
+        val list = cellPawnsMap[cell] ?: return false
         val idx = list.indexOf(pawn).takeIf { it >= 0 } ?: 0
         val baseX = metrics.left + (cell.col + 0.5f) * metrics.cellSize
         val baseY = metrics.top + (cell.row + 0.5f) * metrics.cellSize
-        val (ox, oy) = stackOffset(list.size, idx, metrics.cellSize)
-        return baseX + ox to baseY + oy
+        
+        val d = metrics.cellSize * 0.22f
+        val ox: Float
+        val oy: Float
+        when (list.size) {
+            1 -> { ox = 0f; oy = 0f }
+            2 -> { 
+                ox = if (idx == 0) -d else d
+                oy = 0f
+            }
+            3 -> when (idx) {
+                0 -> { ox = 0f; oy = -d }
+                1 -> { ox = -d * 0.9f; oy = d * 0.55f }
+                else -> { ox = d * 0.9f; oy = d * 0.55f }
+            }
+            else -> {
+                ox = if (idx % 2 == 0) -d else d
+                oy = if (idx < 2) -d else d
+            }
+        }
+        outPoint[0] = baseX + ox
+        outPoint[1] = baseY + oy
+        return true
     }
 
     private fun allocateHomeSlot(color: PlayerColors): Int {
@@ -286,39 +332,32 @@ class LudoBoardForeGroundView @JvmOverloads constructor(
         return 0
     }
 
-    private fun homeCircleCenter(
+    private fun setHomeCircleCenter(
         color: PlayerColors,
         slotIndex: Int,
-        metrics: BoardMetrics
-    ): Pair<Float, Float> {
+        metrics: BoardMetrics,
+        outPoint: FloatArray
+    ): Boolean {
         val (startRow, startColumn) = paneOrigin(color)
         val left = metrics.left
         val top = metrics.top
         val cellSize = metrics.cellSize
-        val outer = RectF(
-            left + startColumn * cellSize,
-            top + startRow * cellSize,
-            left + (startColumn + 6) * cellSize,
-            top + (startRow + 6) * cellSize
-        )
-        val inset = cellSize * 0.9f
-        val inner = RectF(
-            outer.left + inset,
-            outer.top + inset,
-            outer.right - inset,
-            outer.bottom - inset
-        )
+        
+        val innerCenterX = left + startColumn * cellSize + 3 * cellSize
+        val innerCenterY = top + startRow * cellSize + 3 * cellSize
+        
         val offset = cellSize * 1.1f
-        val centerX = inner.centerX()
-        val centerY = inner.centerY()
-        val centers = listOf(
-            centerX - offset to centerY - offset,
-            centerX + offset to centerY - offset,
-            centerX - offset to centerY + offset,
-            centerX + offset to centerY + offset
-        )
         val idx = slotIndex.coerceIn(0, 3)
-        return centers[idx]
+        
+        outPoint[0] = when (idx) {
+            0, 2 -> innerCenterX - offset
+            else -> innerCenterX + offset
+        }
+        outPoint[1] = when (idx) {
+            0, 1 -> innerCenterY - offset
+            else -> innerCenterY + offset
+        }
+        return true
     }
 
     private fun paneOrigin(color: PlayerColors): Pair<Int, Int> = when (color) {
@@ -326,25 +365,6 @@ class LudoBoardForeGroundView @JvmOverloads constructor(
         PlayerColors.YELLOW -> 0 to 9
         PlayerColors.RED -> 9 to 0
         PlayerColors.BLUE -> 9 to 9
-    }
-
-    private fun stackOffset(count: Int, index: Int, cellSize: Float): Pair<Float, Float> {
-        val d = cellSize * 0.22f
-        return when (count) {
-            1 -> 0f to 0f
-            2 -> if (index == 0) -d to 0f else d to 0f
-            3 -> when (index) {
-                0 -> 0f to -d
-                1 -> -d * 0.9f to d * 0.55f
-                else -> d * 0.9f to d * 0.55f
-            }
-            else -> when (index % 4) {
-                0 -> -d to -d
-                1 -> d to -d
-                2 -> -d to d
-                else -> d to d
-            }
-        }
     }
 
     private fun drawableForPlayer(color: PlayerColors): Drawable? = when (color) {

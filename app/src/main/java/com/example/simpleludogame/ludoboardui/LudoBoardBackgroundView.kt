@@ -66,6 +66,8 @@ class LudoBoardBackgroundView @JvmOverloads constructor(
         private val redStartPointCell = 13 to 6
     }
 
+    private var cachedBitmap: android.graphics.Bitmap? = null
+
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         val w = MeasureSpec.getSize(widthMeasureSpec)
         val h = MeasureSpec.getSize(heightMeasureSpec)
@@ -76,9 +78,30 @@ class LudoBoardBackgroundView @JvmOverloads constructor(
         setMeasuredDimension(side, side)
     }
 
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        super.onSizeChanged(w, h, oldw, oldh)
+        if (w > 0 && h > 0) {
+            updateBitmap(w, h)
+        }
+    }
+
+    private fun updateBitmap(w: Int, h: Int) {
+        val bitmap = android.graphics.Bitmap.createBitmap(w, h, android.graphics.Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+        drawToCanvas(canvas, w, h)
+        cachedBitmap = bitmap
+    }
+
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
+        cachedBitmap?.let {
+            canvas.drawBitmap(it, 0f, 0f, null)
+        } ?: run {
+            drawToCanvas(canvas, width, height)
+        }
+    }
 
+    private fun drawToCanvas(canvas: Canvas, width: Int, height: Int) {
         val availableSize = min(width, height).toFloat()
         val cellSize = availableSize / gridSize
         val boardSize = cellSize * gridSize
@@ -88,12 +111,13 @@ class LudoBoardBackgroundView @JvmOverloads constructor(
 
         canvas.drawRoundRect(boardRect, cellSize * 0.45f, cellSize * 0.45f, boardBackgroundPaint)
 
+        val tempRect = RectF()
         for (row in 0 until gridSize) {
             for (column in 0 until gridSize) {
-                val rect = cellRect(left, top, cellSize, row, column)
+                setCellRect(tempRect, left, top, cellSize, row, column)
                 cellPaint.color = colorStartPoints(row, column) ?: colorForCell(row, column)
-                canvas.drawRect(rect, cellPaint)
-                canvas.drawRect(rect, strokePaint)
+                canvas.drawRect(tempRect, cellPaint)
+                canvas.drawRect(tempRect, strokePaint)
             }
         }
 
@@ -144,17 +168,18 @@ class LudoBoardBackgroundView @JvmOverloads constructor(
         val centerY = inner.centerY()
 
         tokenPaint.color = paneColor
-        val centers = listOf(
-            centerX - offset to centerY - offset,
-            centerX + offset to centerY - offset,
-            centerX - offset to centerY + offset,
-            centerX + offset to centerY + offset
-        )
-
-        centers.forEach { (cx, cy) ->
-            canvas.drawCircle(cx, cy, tokenRadius, tokenPaint)
-            canvas.drawCircle(cx, cy, tokenRadius, strokePaint)
-        }
+        
+        canvas.drawCircle(centerX - offset, centerY - offset, tokenRadius, tokenPaint)
+        canvas.drawCircle(centerX - offset, centerY - offset, tokenRadius, strokePaint)
+        
+        canvas.drawCircle(centerX + offset, centerY - offset, tokenRadius, tokenPaint)
+        canvas.drawCircle(centerX + offset, centerY - offset, tokenRadius, strokePaint)
+        
+        canvas.drawCircle(centerX - offset, centerY + offset, tokenRadius, tokenPaint)
+        canvas.drawCircle(centerX - offset, centerY + offset, tokenRadius, strokePaint)
+        
+        canvas.drawCircle(centerX + offset, centerY + offset, tokenRadius, tokenPaint)
+        canvas.drawCircle(centerX + offset, centerY + offset, tokenRadius, strokePaint)
     }
 
     private fun drawGoal(canvas: Canvas, left: Float, top: Float, cellSize: Float) {
@@ -165,41 +190,45 @@ class LudoBoardBackgroundView @JvmOverloads constructor(
         val centerX = (goalLeft + goalRight) / 2f
         val centerY = (goalTop + goalBottom) / 2f
 
-        val topTriangle = Path().apply {
-            moveTo(goalLeft, goalTop)
-            lineTo(goalRight, goalTop)
-            lineTo(centerX, centerY)
-            close()
-        }
-        val rightTriangle = Path().apply {
-            moveTo(goalRight, goalTop)
-            lineTo(goalRight, goalBottom)
-            lineTo(centerX, centerY)
-            close()
-        }
-        val bottomTriangle = Path().apply {
-            moveTo(goalLeft, goalBottom)
-            lineTo(goalRight, goalBottom)
-            lineTo(centerX, centerY)
-            close()
-        }
-        val leftTriangle = Path().apply {
-            moveTo(goalLeft, goalTop)
-            lineTo(goalLeft, goalBottom)
-            lineTo(centerX, centerY)
-            close()
-        }
-
+        val path = Path()
+        
+        // Left triangle (Green)
+        path.reset()
+        path.moveTo(goalLeft, goalTop)
+        path.lineTo(goalLeft, goalBottom)
+        path.lineTo(centerX, centerY)
+        path.close()
         cellPaint.color = greenColor
-        canvas.drawPath(leftTriangle, cellPaint)
+        canvas.drawPath(path, cellPaint)
+        
+        // Bottom triangle (Red)
+        path.reset()
+        path.moveTo(goalLeft, goalBottom)
+        path.lineTo(goalRight, goalBottom)
+        path.lineTo(centerX, centerY)
+        path.close()
         cellPaint.color = redColor
-        canvas.drawPath(bottomTriangle, cellPaint)
+        canvas.drawPath(path, cellPaint)
+        
+        // Right triangle (Blue)
+        path.reset()
+        path.moveTo(goalRight, goalTop)
+        path.lineTo(goalRight, goalBottom)
+        path.lineTo(centerX, centerY)
+        path.close()
         cellPaint.color = blueColor
-        canvas.drawPath(rightTriangle, cellPaint)
+        canvas.drawPath(path, cellPaint)
+        
+        // Top triangle (Yellow)
+        path.reset()
+        path.moveTo(goalLeft, goalTop)
+        path.lineTo(goalRight, goalTop)
+        path.lineTo(centerX, centerY)
+        path.close()
         cellPaint.color = yellowColor
-        canvas.drawPath(topTriangle, cellPaint)
+        canvas.drawPath(path, cellPaint)
 
-        canvas.drawRect(RectF(goalLeft, goalTop, goalRight, goalBottom), strokePaint)
+        canvas.drawRect(goalLeft, goalTop, goalRight, goalBottom, strokePaint)
         canvas.drawLine(goalLeft, goalTop, goalRight, goalBottom, strokePaint)
         canvas.drawLine(goalRight, goalTop, goalLeft, goalBottom, strokePaint)
     }
@@ -212,16 +241,17 @@ class LudoBoardBackgroundView @JvmOverloads constructor(
             12 to 8
         )
 
+        val tempRect = RectF()
         starBounds.forEach { (row, column) ->
-            val rect = cellRect(left, top, cellSize, row, column)
-            val star = starDrawable?.mutate() ?: return@forEach
+            setCellRect(tempRect, left, top, cellSize, row, column)
+            val star = starDrawable ?: return@forEach
             DrawableCompat.setTint(star, starTintColor)
             val inset = (cellSize * 0.18f).toInt()
             star.setBounds(
-                rect.left.toInt() + inset,
-                rect.top.toInt() + inset,
-                rect.right.toInt() - inset,
-                rect.bottom.toInt() - inset
+                tempRect.left.toInt() + inset,
+                tempRect.top.toInt() + inset,
+                tempRect.right.toInt() - inset,
+                tempRect.bottom.toInt() - inset
             )
             star.draw(canvas)
         }
@@ -247,15 +277,17 @@ class LudoBoardBackgroundView @JvmOverloads constructor(
         }
     }
 
-    private fun cellRect(
+    private fun setCellRect(
+        rect: RectF,
         left: Float,
         top: Float,
         cellSize: Float,
         row: Int,
         column: Int
-    ): RectF {
+    ) {
         val cellLeft = left + column * cellSize
         val cellTop = top + row * cellSize
-        return RectF(cellLeft, cellTop, cellLeft + cellSize, cellTop + cellSize)
+        rect.set(cellLeft, cellTop, cellLeft + cellSize, cellTop + cellSize)
     }
+
 }
