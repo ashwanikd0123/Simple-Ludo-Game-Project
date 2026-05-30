@@ -9,13 +9,20 @@ import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.TextView
 import com.example.simpleludogame.R
+import dagger.hilt.android.qualifiers.ActivityContext
+import javax.inject.Inject
 
-class SettingsAdapter(
-    private val context: Context,
-    private val items: List<SettingItem>
+class SettingsAdapter @Inject constructor(
+    @ActivityContext private val context: Context
 ) : BaseAdapter() {
 
+    private var items: List<SettingItem> = emptyList()
     private val inflater = LayoutInflater.from(context)
+
+    fun setItems(items: List<SettingItem>) {
+        this.items = items
+        notifyDataSetChanged()
+    }
 
     override fun getCount(): Int = items.size
     override fun getItem(position: Int): Any = items[position]

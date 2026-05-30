@@ -11,10 +11,16 @@ import com.example.simpleludogame.game.gamemodel.ludomodel.player.Player
 import com.example.simpleludogame.game.gamemodel.ludomodel.player.PlayerStatus
 import com.example.simpleludogame.game.gamemodel.ludomodel.cell.CellType
 import com.example.simpleludogame.ludoboardui.LudoBoardForeGroundView
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class GameViewModel() : ViewModel() {
+@HiltViewModel
+class GameViewModel @Inject constructor(
+    val dice: Dice,
+    val gameConstants: GameConstants
+) : ViewModel() {
     private var gameModel: GameModel? = null
 
     private val _currentPlayer = MutableLiveData<Int>()
@@ -45,13 +51,10 @@ class GameViewModel() : ViewModel() {
     val starCell: LiveData<Boolean> = _starCell
 
     var playerRanking = 1
-    lateinit var dice: Dice
-    lateinit var gameConstants: GameConstants
 
-    fun initGame(context: Context, playerCount: Int) {
+    fun initGame(playerCount: Int) {
         gameModel = GameModel(playerCount)
-        dice = Dice(context)
-        gameConstants = GameConstants(context)
+        dice.reset()
         _starCell.value = false
         playerRanking = 0
         _gameEnd.value = false

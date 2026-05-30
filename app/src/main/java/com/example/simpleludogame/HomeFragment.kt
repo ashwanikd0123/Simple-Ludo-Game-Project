@@ -9,7 +9,9 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.example.simpleludogame.databinding.FragmentHomeBinding
 import com.example.simpleludogame.game.gamemodel.GameViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class HomeFragment : Fragment() {
 
     private val viewModel: GameViewModel by activityViewModels()
@@ -33,7 +35,7 @@ class HomeFragment : Fragment() {
         binding.playButton.setOnClickListener {
             // Spinner positions: 0 -> 2 players, 1 -> 3 players, 2 -> 4 players
             val playerCount = binding.playerCountSpinner.selectedItemPosition + 2
-            viewModel.initGame(requireContext(), playerCount)
+            viewModel.initGame(playerCount)
             findNavController().navigate(R.id.action_homeFragment_to_gameFragment)
         }
 

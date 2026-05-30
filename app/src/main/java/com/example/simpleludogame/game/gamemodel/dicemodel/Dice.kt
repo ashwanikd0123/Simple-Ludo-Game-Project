@@ -24,6 +24,10 @@ class Dice(context: Context) {
 
     private val sixCounts = IntArray(4)
 
+    fun reset() {
+        sixCounts.fill(0)
+    }
+
     fun roll(playerIndex: Int): Int {
         val value = (1..6).random()
 

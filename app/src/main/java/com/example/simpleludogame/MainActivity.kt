@@ -20,6 +20,9 @@ import com.example.simpleludogame.game.gamemodel.GameViewModel
 import com.example.simpleludogame.settings.SETTINGS_KEY
 import kotlin.getValue
 
+import dagger.hilt.android.AndroidEntryPoint
+
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     private val viewModel: GameViewModel by viewModels()
 

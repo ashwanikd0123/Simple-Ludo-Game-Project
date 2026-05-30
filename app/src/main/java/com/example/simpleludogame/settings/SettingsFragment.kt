@@ -13,12 +13,21 @@ import com.example.simpleludogame.game.MediaManager
 import com.example.simpleludogame.game.gamemodel.GameConstants
 import com.example.simpleludogame.game.gamemodel.dicemodel.Dice
 import androidx.core.content.edit
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 val SETTINGS_KEY = "game_settings"
 
+@AndroidEntryPoint
 class SettingsFragment : Fragment() {
 
     private lateinit var binding: FragmentSettingsBinding
+
+    @Inject
+    lateinit var mediaManager: MediaManager
+
+    @Inject
+    lateinit var settingsAdapter: SettingsAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -94,7 +103,8 @@ class SettingsFragment : Fragment() {
             }
         )
 
-        binding.settingsListView.adapter = SettingsAdapter(requireContext(), items)
+        settingsAdapter.setItems(items)
+        binding.settingsListView.adapter = settingsAdapter
     }
 
     fun updateTheme(mode: Int) {

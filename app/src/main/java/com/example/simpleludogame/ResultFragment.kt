@@ -14,7 +14,9 @@ import com.example.simpleludogame.game.gamemodel.GameViewModel
 import com.example.simpleludogame.game.gamemodel.ludomodel.player.Player
 import com.example.simpleludogame.game.gamemodel.ludomodel.player.PlayerColors
 import com.example.simpleludogame.game.gamemodel.ludomodel.player.PlayerStatus
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class ResultFragment : Fragment() {
     private val viewModel: GameViewModel by activityViewModels()
     private lateinit var binding: FragmentResultBinding

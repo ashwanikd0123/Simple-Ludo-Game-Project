@@ -16,19 +16,23 @@ import com.example.simpleludogame.R
 import com.example.simpleludogame.databinding.FragmentGameBinding
 import com.example.simpleludogame.game.gamemodel.GameViewModel
 import com.example.simpleludogame.game.gamemodel.ludomodel.player.PlayerColors
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class GameFragment : Fragment() {
 
     private val viewModel: GameViewModel by activityViewModels()
     private lateinit var binding: FragmentGameBinding
-    private lateinit var mediaManager: MediaManager
+    
+    @Inject
+    lateinit var mediaManager: MediaManager
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentGameBinding.inflate(inflater, container, false)
-        mediaManager = MediaManager(requireContext())
         setListeners()
         setObservers()
         checkDeveloperMode()
