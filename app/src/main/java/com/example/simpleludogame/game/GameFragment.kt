@@ -71,6 +71,10 @@ class GameFragment : Fragment() {
             binding.diceButton.setImageResource(getDrawableResource(it))
         }
 
+        viewModel.isMoving.observe(viewLifecycleOwner) {
+            binding.diceButton.isEnabled = !it
+        }
+
         viewModel.starCell.observe(viewLifecycleOwner) {
             if (!it) {
                 return@observe
@@ -84,9 +88,10 @@ class GameFragment : Fragment() {
         }
 
         viewModel.gameEnd.observe(viewLifecycleOwner) {
-            if (it) {
-                findNavController().navigate(R.id.action_gameFragment_to_resultFragment)
+            if (!it) {
+                return@observe
             }
+            findNavController().navigate(R.id.action_gameFragment_to_resultFragment)
         }
 
         viewModel.selectablePawns.observe(viewLifecycleOwner) {
