@@ -1,6 +1,5 @@
 package com.example.simpleludogame.settings
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,15 +8,11 @@ import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.TextView
 import com.example.simpleludogame.R
-import dagger.hilt.android.qualifiers.ActivityContext
 import javax.inject.Inject
 
-class SettingsAdapter @Inject constructor(
-    @ActivityContext private val context: Context
-) : BaseAdapter() {
+class SettingsAdapter @Inject constructor() : BaseAdapter() {
 
     private var items: List<SettingItem> = emptyList()
-    private val inflater = LayoutInflater.from(context)
 
     fun setItems(items: List<SettingItem>) {
         this.items = items
@@ -37,7 +32,10 @@ class SettingsAdapter @Inject constructor(
     }
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
+        val context = parent?.context ?: throw IllegalStateException("Parent context is null")
+        val inflater = LayoutInflater.from(context)
         val item = items[position]
+
         return when (item) {
             is SettingItem.Header -> {
                 val view = convertView ?: inflater.inflate(R.layout.setting_item_header, parent, false)
