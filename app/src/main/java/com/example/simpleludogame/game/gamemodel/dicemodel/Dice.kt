@@ -1,9 +1,8 @@
 package com.example.simpleludogame.game.gamemodel.dicemodel
 
 import android.content.Context
-import com.example.simpleludogame.game.MediaManager.Companion.SOUND_KEY
-import com.example.simpleludogame.game.MediaManager.Companion.VIBRATION_KEY
 import com.example.simpleludogame.settings.SETTINGS_KEY
+import kotlin.random.Random
 
 class Dice(context: Context) {
 
@@ -23,13 +22,15 @@ class Dice(context: Context) {
     }
 
     private val sixCounts = IntArray(4)
+    private val generators = Array(4) { index -> Random(System.nanoTime() + index) }
 
     fun reset() {
         sixCounts.fill(0)
     }
 
     fun roll(playerIndex: Int): Int {
-        val value = (1..6).random()
+        val generator = generators[playerIndex]
+        val value = generator.nextInt(1, 7)
 
         if (diceBehavior == DiceBehavior.DEFAULT) {
             return value
@@ -47,7 +48,7 @@ class Dice(context: Context) {
             if (diceBehavior == DiceBehavior.CANCEL_ON_THIRD_SIX) {
                 return 0
             }
-            return (1..5).random()
+            return generator.nextInt(1, 6)
         }
 
         return 6
