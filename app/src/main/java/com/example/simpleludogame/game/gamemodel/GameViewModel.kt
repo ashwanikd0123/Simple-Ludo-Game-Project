@@ -1,6 +1,5 @@
 package com.example.simpleludogame.game.gamemodel
 
-import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -12,8 +11,10 @@ import com.example.simpleludogame.game.gamemodel.ludomodel.player.PlayerStatus
 import com.example.simpleludogame.game.gamemodel.ludomodel.cell.CellType
 import com.example.simpleludogame.ludoboardui.LudoBoardForeGroundView
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -54,13 +55,16 @@ class GameViewModel @Inject constructor(
 
     fun initGame(playerCount: Int) {
         gameModel = GameModel(playerCount)
+
         dice.reset()
+
         _starCell.value = false
         playerRanking = 0
         _gameEnd.value = false
         _isMoving.value = false
         _selectablePawns.value = emptyList()
         _cutPawnCount.value = 0
+
         updateCurrentPlayer()
     }
     
@@ -99,84 +103,98 @@ class GameViewModel @Inject constructor(
         }
 
         _diceVal.value = num
-
         _isMoving.value = true
 
-        val currentPlayer = gameModel?.getCurrentPlayer() ?: return
-        val movablePawns = currentPlayer.canMove(num)
-        if (movablePawns.isEmpty()) {
-            viewModelScope.launch {
-                delay(LudoBoardForeGroundView.PAWN_MOVE_ANIMATION_DURATION_MS.toLong() + 500L)
+        viewModelScope.launch(Dispatchers.Default) {
+            val currentPlayer = gameModel?.getCurrentPlayer() ?: return@launch
+            val movablePawns = currentPlayer.canMove(num)
+            if (movablePawns.isEmpty()) {
+                delay(LudoBoardForeGroundView.PAWN_MOVE_ANIMATION_DURATION_MS + 500L)
                 moveNextPlayer()
+                return@launch
             }
-            return
-        }
 
-        _selectablePawns.value = movablePawns
+            withContext(Dispatchers.Main) {
+                _selectablePawns.value = movablePawns
 
-        if (movablePawns.size == 1) {
-            movePawn(movablePawns[0])
+                if (movablePawns.size == 1) {
+                    movePawn(movablePawns[0])
+                }
+            }
         }
     }
 
     fun updateCurrentPlayer() {
         gameModel?.let {
-            _currentPlayer.value = it.currentPlayer
+            _currentPlayer.postValue(it.currentPlayer)
         }
     }
 
     fun movePawn(pawn: Pawn) {
-        if (!_selectablePawns.value!!.contains(pawn)) {
+        if (_selectablePawns.value?.contains(pawn) != true) {
             return
         }
 
-        val num = _diceVal.value!!
+        val num = _diceVal.value ?: return
         val currentPlayer = gameModel?.getCurrentPlayer() ?: return
-        val moves = currentPlayer.getNumberOfMoves(pawn, num)
 
-        viewModelScope.launch {
+        _selectablePawns.value = emptyList()
+
+        viewModelScope.launch(Dispatchers.Default) {
+            val moves = currentPlayer.getNumberOfMoves(pawn, num)
+
             delay(500L)
 
             for (i in 1..<moves) {
-                currentPlayer.moveOneUnit(pawn)
-                delay(LudoBoardForeGroundView.PAWN_MOVE_ANIMATION_DURATION_MS.toLong() + 50L)
+                withContext(Dispatchers.Main) {
+                    currentPlayer.moveOneUnit(pawn)
+                }
+                delay(LudoBoardForeGroundView.PAWN_MOVE_ANIMATION_DURATION_MS + 50L)
             }
 
-            _cutPawnCount.value = currentPlayer.resolveNextCell(pawn)
-            currentPlayer.moveOneUnit(pawn)
+            var cutCount = 0
+            withContext(Dispatchers.Main) {
+                cutCount = currentPlayer.resolveNextCell(pawn)
+                _cutPawnCount.value = cutCount
+                currentPlayer.moveOneUnit(pawn)
+            }
 
-            val finalCell = pawn.cell.value!!
+            val finalCell = pawn.getCell()
 
-            if (finalCell.type == CellType.GOAL) {
-                _pawnEnteredGoal.value = true
-            } else if (finalCell.type == CellType.STAR && finalCell != currentPlayer.startCell) {
-                _starCell.value = true
-                _starCell.value = false
+            if (finalCell?.type == CellType.GOAL) {
+                _pawnEnteredGoal.postValue(true)
+            } else if (finalCell?.type == CellType.STAR && finalCell != currentPlayer.startCell) {
+                withContext(Dispatchers.Main) {
+                    _starCell.value = true
+                    _starCell.value = false
+                }
             }
 
             // short delay before next move
-            delay(LudoBoardForeGroundView.PAWN_MOVE_ANIMATION_DURATION_MS.toLong() + 100L)
+            delay(LudoBoardForeGroundView.PAWN_MOVE_ANIMATION_DURATION_MS + 100L)
 
             var shouldMoveToNextPlayer = true
 
             // if was able to cut pawn then player will get second chance
-            if (_cutPawnCount.value!! > 0 && gameConstants.bonusChancePlayerCutActive) {
+            if (cutCount > 0 && gameConstants.bonusChancePlayerCutActive) {
                 shouldMoveToNextPlayer = false
             }
 
             // when last number was 6 or pawn reached goal player gets second chance
-            if (pawn.cell.value?.type == CellType.GOAL || num == 6) {
+            if (finalCell?.type == CellType.GOAL || num == 6) {
                 shouldMoveToNextPlayer = false
             }
 
             // if player has won then move to next player
             if (currentPlayer.hasWon()) {
                 playerRanking++
-                when (playerRanking) {
-                    1 -> currentPlayer.setStatus(PlayerStatus.RANK_1)
-                    2 -> currentPlayer.setStatus(PlayerStatus.RANK_2)
-                    3 -> currentPlayer.setStatus(PlayerStatus.RANK_3)
-                    else -> currentPlayer.setStatus(PlayerStatus.LOSE)
+                withContext(Dispatchers.Main) {
+                    when (playerRanking) {
+                        1 -> currentPlayer.setStatus(PlayerStatus.RANK_1)
+                        2 -> currentPlayer.setStatus(PlayerStatus.RANK_2)
+                        3 -> currentPlayer.setStatus(PlayerStatus.RANK_3)
+                        else -> currentPlayer.setStatus(PlayerStatus.LOSE)
+                    }
                 }
                 shouldMoveToNextPlayer = true
             }
@@ -184,15 +202,13 @@ class GameViewModel @Inject constructor(
             if (shouldMoveToNextPlayer) {
                 moveNextPlayer()
             } else {
-                _isMoving.value = false
+                _isMoving.postValue(false)
             }
         }
-
-        _selectablePawns.value = emptyList()
     }
-
+    
     private fun moveNextPlayer() {
-        _gameEnd.value = gameModel?.gameEnd()
+        _gameEnd.postValue(gameModel?.gameEnd())
         gameModel?.moveToNextPlayer()
         updateCurrentPlayer()
         _isMoving.postValue(false)

@@ -43,7 +43,7 @@ class ResultFragment : Fragment() {
         val players = viewModel.getAllPlayers()
         
         // Sort players by rank
-        val sortedPlayers = players.sortedBy { player ->
+        val sortedPlayers = players.sortedBy { player: Player ->
             when (player.getStatus()) {
                 PlayerStatus.RANK_1 -> 1
                 PlayerStatus.RANK_2 -> 2
@@ -51,6 +51,7 @@ class ResultFragment : Fragment() {
                 PlayerStatus.WON -> 4
                 PlayerStatus.PLAYING -> 5
                 PlayerStatus.LOSE -> 6
+                PlayerStatus.LEFT_GAME -> 7
             }
         }
 
